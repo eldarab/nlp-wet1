@@ -14,14 +14,14 @@ class feature_statistics_class:
         self.file_path = file_path
         self.n_total_features = 0  # Total number of features accumulated
         self.f100_count_dict = OrderedDict()  # Init all features dictionaries
-        self.f101_count_dict = OrderedDict()
-        self.f102_count_dict = OrderedDict()
-        self.f103_count_dict = OrderedDict()
-        self.f104_count_dict = OrderedDict()
-        self.f105_count_dict = OrderedDict()
-        self.f108_count_dict = OrderedDict()
-        self.f109_count_dict = OrderedDict()
-        self.f110_count_dict = OrderedDict()
+        self.f101_count_dict = OrderedDict()  # Prefix features
+        self.f102_count_dict = OrderedDict()  # Suffix features
+        self.f103_count_dict = OrderedDict()  # Trigram features
+        self.f104_count_dict = OrderedDict()  # Bigram features
+        self.f105_count_dict = OrderedDict()  # Unigram features
+        self.f108_count_dict = OrderedDict()  # Contain Number features
+        self.f109_count_dict = OrderedDict()  # Contain Uppercase features
+        self.f110_count_dict = OrderedDict()  # Contain Hyphen features
 
     def count_f100(self):
         with open(self.file_path) as f:
@@ -272,29 +272,47 @@ class feature2id_class:
         self.total_features += self.f110_counter
 
 
-def represent_history_with_features(history, f100_index_dict, f103_index_dict,
-                                    f104_index_dict, f105_index_dict):
+# TODO change input to feature2id_class instead of this bullshit
+def represent_history_with_features(history, ids):
     pword, cword, nword = history[5], history[0], history[4]
     pptag, ptag, ctag = history[1], history[2], history[3]
     features = []
 
-    if (cword, ctag) in f100_index_dict:
-        features.append(f100_index_dict[(cword, ctag)])
+    if (cword, ctag) in ids.f100_index_dict:
+        features.append(ids.f100_index_dict[(cword, ctag)])
 
-    if ctag in f105_index_dict:
-        features.append(f105_index_dict[ctag])
+    for n in range(1, 5):
+        if len(cword) <= n:
+            break
+        if (cword[:n], ctag) in ids.f101_index_dict:
+            features.append(ids.f101_index_dict[(cword[:n], ctag)])
+        if (cword[-n:], ctag) in ids.f102_index_dict:
+            features.append(ids.f102_index_dict[(cword[-n:], ctag)])
 
-    if (ptag, ctag) in f104_index_dict:
-        features.append(f104_index_dict[(ptag, ctag)])
+    if (pptag, ptag, ctag) in ids.f103_index_dict:
+        features.append(ids.f103_index_dict[(pptag, ptag, ctag)])
 
-    if (pptag, ptag, ctag) in f103_index_dict:
-        features.append(f103_index_dict[(pptag, ptag, ctag)])
+    if (ptag, ctag) in ids.f104_index_dict:
+        features.append(ids.f104_index_dict[(ptag, ctag)])
+
+    if ctag in ids.f105_index_dict:
+        features.append(ids.f105_index_dict[ctag])
+
+    if has_digit(cword) and (CONTAINS_DIGIT, ctag) in ids.f108_index_dict:
+        features.append(ids.f108_index_dict[(CONTAINS_DIGIT, ctag)])
+
+    if not cword.lower() and (CONTAINS_UPPER, ctag) in ids.f109_index_dict:
+        features.append(ids.f109_index_dict[(CONTAINS_UPPER, ctag)])
+
+    if has_hyphen(cword) and (CONTAINS_HYPHEN, ctag) in ids.f110_index_dict:
+        features.append(ids.f110_index_dict[(CONTAINS_HYPHEN, ctag)])
 
     return features
 
 
 if __name__ == '__main__':
-    stats = feature_statistics_class('train1.wtag')
+    file_path = 'debugging_dataset.wtag'
+    stats = feature_statistics_class(file_path)
     stats.count_f100()
     stats.count_f101()
     stats.count_f102()
@@ -304,17 +322,16 @@ if __name__ == '__main__':
     stats.count_f108()
     stats.count_f109()
     stats.count_f110()
-    ids = feature2id_class('train1.wtag', stats, 4)
-    ids.initialize_f100_index_dict()
-    ids.initialize_f101_index_dict()
-    ids.initialize_f102_index_dict()
-    ids.initialize_f103_index_dict()
-    ids.initialize_f104_index_dict()
-    ids.initialize_f105_index_dict()
-    ids.initialize_f108_index_dict()
-    ids.initialize_f109_index_dict()
-    ids.initialize_f110_index_dict()
+    aids = feature2id_class(file_path, stats, 4)
+    aids.initialize_f100_index_dict()
+    aids.initialize_f101_index_dict()
+    aids.initialize_f102_index_dict()
+    aids.initialize_f103_index_dict()
+    aids.initialize_f104_index_dict()
+    aids.initialize_f105_index_dict()
+    aids.initialize_f108_index_dict()
+    aids.initialize_f109_index_dict()
+    aids.initialize_f110_index_dict()
     history1 = ('went', '*B', 'NN', 'VBD', 'Eldar', 'to')
-    rep = represent_history_with_features(history1, ids.f100_index_dict, ids.f103_index_dict,
-                                          ids.f104_index_dict, ids.f105_index_dict)
+    rep = represent_history_with_features(history1, aids)
     pass
