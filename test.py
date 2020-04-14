@@ -21,14 +21,10 @@ class feature_statistics_class:
                 if len(words_arr) == 0:
                     return
                 words_arr[-1] = words_arr[-1][:-1]  # removing \n from end of line
+
                 for word in words_arr:
-                    # TODO normalize capital letters (for example "the" and "The")
-                    # cur_word, cur_tag = word.split('_')
                     cur_word, cur_tag = parse_lower(word)
-                    if (cur_word, cur_tag) not in self.f100_count_dict:
-                        self.f100_count_dict[(cur_word, cur_tag)] = 1
-                    else:
-                        self.f100_count_dict[(cur_word, cur_tag)] += 1
+                    add_or_append(self.f100_count_dict, (cur_word, cur_tag))
 
     def count_f101(self, file_path):
         with open(file_path) as f:
@@ -96,7 +92,7 @@ class feature_statistics_class:
                     else:
                         self.f103_count_dict[(pptag, ptag, ctag)] += 1
 
-                # I think this is does the same thing
+                # I think this does the same thing
 
                 ptag = BEGIN
                 ctag = BEGIN
@@ -104,10 +100,7 @@ class feature_statistics_class:
                     pptag = ptag
                     ptag = ctag
                     ctag = word.split('_')[1]
-                    if (pptag, ptag, ctag) not in self.f103_count_dict:
-                        self.f103_count_dict[(pptag, ptag, ctag)] = 1
-                    else:
-                        self.f103_count_dict[(pptag, ptag, ctag)] += 1
+                    add_or_append(self.f103_count_dict, (pptag, ptag, ctag))
 
     def count_f104(self, file_path):
         with open(file_path) as f:
@@ -150,10 +143,11 @@ class feature_statistics_class:
                 words_arr[-1] = words_arr[-1][:-1]  # removing \n from end of line
                 for i in range(len(words_arr)):
                     ctag = words_arr[i].split('_')[1]
-                    if ctag not in self.f105_count_dict:
-                        self.f105_count_dict[ctag] = 1
-                    else:
-                        self.f105_count_dict[ctag] += 1
+                    add_or_append(self.f105_count_dict, ctag)
+                    # if ctag not in self.f105_count_dict:
+                    #     self.f105_count_dict[ctag] = 1
+                    # else:
+                    #     self.f105_count_dict[ctag] += 1
 
 
 class feature2id_class:
@@ -163,11 +157,15 @@ class feature2id_class:
         self.total_features = 0  # Total number of features accumulated
         # Internal feature indexing
         self.f100_counter = 0
+        self.f101_counter = 0
+        self.f102_counter = 0
         self.f103_counter = 0
         self.f104_counter = 0
         self.f105_counter = 0
         # Init all features dictionaries
         self.f100_index_dict = OrderedDict()
+        self.f101_index_dict = OrderedDict()
+        self.f102_index_dict = OrderedDict()
         self.f103_index_dict = OrderedDict()
         self.f104_index_dict = OrderedDict()
         self.f105_index_dict = OrderedDict()
