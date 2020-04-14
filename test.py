@@ -111,6 +111,34 @@ class feature2id_class:
         with open(file_path) as f:
             for line in f:
                 words_arr = get_words_arr(line)
+                for word in words_arr:
+                    cword, ctag = parse_lower(word)
+                    for n in range(1, 5):
+                        if len(cword) <= n:
+                            break
+                        prefix = cword[:n]
+                        if (prefix, ctag) not in self.f101_index_dict \
+                                and self.feature_statistics.f101_count_dict[(prefix, ctag)] >= self.threshold:
+                            self.f101_index_dict[(prefix, ctag)] = self.f101_counter
+                            self.f101_counter += 1
+        self.total_features += self.f101_counter
+
+    def initialize_f102_index_dict(self, file_path):
+        with open(file_path) as f:
+            for line in f:
+                words_arr = get_words_arr(line)
+                for word in words_arr:
+                    cword, ctag = parse_lower(word)
+                    for n in range(1, 5):
+                        if len(cword) <= n:
+                            break
+                        suffix = cword[-n:]
+                        if (suffix, ctag) not in self.f102_index_dict \
+                                and self.feature_statistics.f102_count_dict[(suffix, ctag)] >= self.threshold:
+                            self.f101_index_dict[(suffix, ctag)] = self.f102_counter
+                            self.f102_counter += 1
+        self.total_features += self.f102_counter
+
 
     def initialize_f103_index_dict(self, file_path):
         with open(file_path) as f:
