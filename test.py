@@ -21,6 +21,7 @@ class feature_statistics_class:
         self.f105_count_dict = OrderedDict()
         self.f108_count_dict = OrderedDict()
         self.f109_count_dict = OrderedDict()
+        self.f110_count_dict = OrderedDict()
 
     def count_f100(self):
         with open(self.file_path) as f:
@@ -107,7 +108,7 @@ class feature_statistics_class:
                 for word_tag in words_tags_arr:
                     cword, ctag = word_tag.split('_')[0], word_tag.split('_')[1]
                     if has_hyphen(cword):
-                        add_or_append(self.f108_count_dict, (CONTAINS_HYPHEN, ctag))
+                        add_or_append(self.f110_count_dict, (CONTAINS_HYPHEN, ctag))
 
 
 class feature2id_class:
@@ -125,6 +126,7 @@ class feature2id_class:
         self.f105_counter = 0
         self.f108_counter = 0
         self.f109_counter = 0
+        self.f110_counter = 0
         # Init all features dictionaries
         self.f100_index_dict = OrderedDict()
         self.f101_index_dict = OrderedDict()
@@ -134,6 +136,7 @@ class feature2id_class:
         self.f105_index_dict = OrderedDict()
         self.f108_index_dict = OrderedDict()
         self.f109_index_dict = OrderedDict()
+        self.f110_index_dict = OrderedDict()
 
     def set_feature_index(self, key_tuple, feature_index_dict, feature_count_dict, feature_counter):
         if key_tuple not in feature_index_dict and feature_count_dict[key_tuple] >= self.threshold:
@@ -255,6 +258,19 @@ class feature2id_class:
                             self.f109_counter += 1
         self.total_features += self.f109_counter
 
+    def initialize_f110_index_dict(self):
+        with open(self.file_path) as f:
+            for line in f:
+                words_tags_arr = get_words_arr(line)
+                for word_tag in words_tags_arr:
+                    cword, ctag = word_tag.split('_')
+                    if has_hyphen(cword):
+                        if (CONTAINS_HYPHEN, ctag) not in self.f110_index_dict \
+                                and self.feature_statistics.f110_count_dict[(CONTAINS_HYPHEN, ctag)] >= self.threshold:
+                            self.f110_index_dict[(CONTAINS_HYPHEN, ctag)] = self.f110_counter + self.total_features
+                            self.f110_counter += 1
+        self.total_features += self.f110_counter
+
 
 def represent_history_with_features(history, f100_index_dict, f103_index_dict,
                                     f104_index_dict, f105_index_dict):
@@ -287,13 +303,17 @@ if __name__ == '__main__':
     stats.count_f105()
     stats.count_f108()
     stats.count_f109()
+    stats.count_f110()
     ids = feature2id_class('train1.wtag', stats, 4)
     ids.initialize_f100_index_dict()
+    ids.initialize_f101_index_dict()
+    ids.initialize_f102_index_dict()
     ids.initialize_f103_index_dict()
     ids.initialize_f104_index_dict()
     ids.initialize_f105_index_dict()
     ids.initialize_f108_index_dict()
     ids.initialize_f109_index_dict()
+    ids.initialize_f110_index_dict()
     history1 = ('went', '*B', 'NN', 'VBD', 'Eldar', 'to')
     rep = represent_history_with_features(history1, ids.f100_index_dict, ids.f103_index_dict,
                                           ids.f104_index_dict, ids.f105_index_dict)
