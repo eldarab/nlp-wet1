@@ -35,11 +35,11 @@ class feature_statistics_class:
                 words_arr[-1] = words_arr[-1][:-1]
 
                 for word in words_arr:
-                    c_word, c_tag = parse_lower(word)
+                    cword, ctag = parse_lower(word)
                     for n in range(1, 5):
-                        if len(c_word) <= n:
+                        if len(cword) <= n:
                             break
-                        add_or_append(self.f101_count_dict, (c_word[:n], c_tag))
+                        add_or_append(self.f101_count_dict, (cword[:n], ctag))
 
     def count_f102(self, file_path):
         with open(file_path) as f:
@@ -64,35 +64,35 @@ class feature_statistics_class:
                     return
                 words_arr[-1] = words_arr[-1][:-1]  # removing \n from end of line
 
-                # first word
-                ctag = words_arr[0].split('_')[1]
-                if (BEGIN, BEGIN, ctag) not in self.f103_count_dict:
-                    self.f103_count_dict[(BEGIN, BEGIN, ctag)] = 1
-                else:
-                    self.f103_count_dict[(BEGIN, BEGIN, ctag)] += 1
-
-                if len(words_arr) == 1:  # our job is done if the line only includes one word
-                    return
-
-                # second word
-                ptag = ctag
-                ctag = words_arr[1].split('_')[1]
-                if (BEGIN, ptag, ctag) not in self.f103_count_dict:
-                    self.f103_count_dict[(BEGIN, ptag, ctag)] = 1
-                else:
-                    self.f103_count_dict[(BEGIN, ptag, ctag)] += 1
-
-                # third word and on
-                for i in range(2, len(words_arr)):
-                    pptag = ptag
-                    ptag = ctag
-                    ctag = words_arr[i].split('_')[1]
-                    if (pptag, ptag, ctag) not in self.f103_count_dict:
-                        self.f103_count_dict[(pptag, ptag, ctag)] = 1
-                    else:
-                        self.f103_count_dict[(pptag, ptag, ctag)] += 1
-
-                # I think this does the same thing
+                # # first word
+                # ctag = words_arr[0].split('_')[1]
+                # if (BEGIN, BEGIN, ctag) not in self.f103_count_dict:
+                #     self.f103_count_dict[(BEGIN, BEGIN, ctag)] = 1
+                # else:
+                #     self.f103_count_dict[(BEGIN, BEGIN, ctag)] += 1
+                #
+                # if len(words_arr) == 1:  # our job is done if the line only includes one word
+                #     return
+                #
+                # # second word
+                # ptag = ctag
+                # ctag = words_arr[1].split('_')[1]
+                # if (BEGIN, ptag, ctag) not in self.f103_count_dict:
+                #     self.f103_count_dict[(BEGIN, ptag, ctag)] = 1
+                # else:
+                #     self.f103_count_dict[(BEGIN, ptag, ctag)] += 1
+                #
+                # # third word and on
+                # for i in range(2, len(words_arr)):
+                #     pptag = ptag
+                #     ptag = ctag
+                #     ctag = words_arr[i].split('_')[1]
+                #     if (pptag, ptag, ctag) not in self.f103_count_dict:
+                #         self.f103_count_dict[(pptag, ptag, ctag)] = 1
+                #     else:
+                #         self.f103_count_dict[(pptag, ptag, ctag)] += 1
+                #
+                # # I think this does the same thing
 
                 ptag = BEGIN
                 ctag = BEGIN
@@ -110,23 +110,21 @@ class feature_statistics_class:
                     return
                 words_arr[-1] = words_arr[-1][:-1]  # removing \n from end of line
 
-                # first word
-                ctag = words_arr[0].split('_')[1]
-                if (BEGIN, ctag) not in self.f104_count_dict:
-                    self.f104_count_dict[(BEGIN, ctag)] = 1
-                else:
-                    self.f104_count_dict[(BEGIN, ctag)] += 1
-
-                # second word and on
-                for i in range(1, len(words_arr)):
-                    ptag = ctag
-                    ctag = words_arr[i].split('_')[1]
-                    if (ptag, ctag) not in self.f104_count_dict:
-                        self.f104_count_dict[(ptag, ctag)] = 1
-                    else:
-                        self.f104_count_dict[(ptag, ctag)] += 1
-
-                # I think these are equivalent
+                # # first word
+                # ctag = words_arr[0].split('_')[1]
+                # if (BEGIN, ctag) not in self.f104_count_dict:
+                #     self.f104_count_dict[(BEGIN, ctag)] = 1
+                # else:
+                #     self.f104_count_dict[(BEGIN, ctag)] += 1
+                #
+                # # second word and on
+                # for i in range(1, len(words_arr)):
+                #     ptag = ctag
+                #     ctag = words_arr[i].split('_')[1]
+                #     if (ptag, ctag) not in self.f104_count_dict:
+                #         self.f104_count_dict[(ptag, ctag)] = 1
+                #     else:
+                #         self.f104_count_dict[(ptag, ctag)] += 1
 
                 ctag = BEGIN
                 for word in words_arr:
@@ -178,8 +176,9 @@ class feature2id_class:
                     return
                 words_arr[-1] = words_arr[-1][:-1]
                 for word in words_arr:
-                    # TODO think about normalizing capital letters (for example "the" and "The")
-                    cur_word, cur_tag = word.split('_')
+                    cur_word, cur_tag = parse_lower(word)
+                    # cur_word, cur_tag = word.split('_')
+
                     if (cur_word, cur_tag) not in self.f100_index_dict \
                             and self.feature_statistics.f100_count_dict[(cur_word, cur_tag)] >= self.threshold:
                         self.f100_index_dict[(cur_word, cur_tag)] = self.f100_counter
