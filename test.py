@@ -97,6 +97,7 @@ class feature2id_class:
         self.f103_counter = 0
         self.f104_counter = 0
         self.f105_counter = 0
+        self.f109_counter = 0
         # Init all features dictionaries
         self.f100_index_dict = OrderedDict()
         self.f101_index_dict = OrderedDict()
@@ -104,9 +105,9 @@ class feature2id_class:
         self.f103_index_dict = OrderedDict()
         self.f104_index_dict = OrderedDict()
         self.f105_index_dict = OrderedDict()
+        self.f109_index_dict = OrderedDict()
 
     def initialize_f100_index_dict(self, file_path):
-        self.f100_counter = self.total_features
         with open(file_path) as f:
             for line in f:
                 words_arr = get_words_arr(line)
@@ -114,12 +115,11 @@ class feature2id_class:
                     cword, ctag = parse_lower(word)
                     if (cword, ctag) not in self.f100_index_dict \
                             and self.feature_statistics.f100_count_dict[(cword, ctag)] >= self.threshold:
-                        self.f100_index_dict[(cword, ctag)] = self.f100_counter
+                        self.f100_index_dict[(cword, ctag)] = self.f100_counter + self.total_features
                         self.f100_counter += 1
         self.total_features += self.f100_counter
 
     def initialize_f101_index_dict(self, file_path):
-        self.f101_counter = self.total_features
         with open(file_path) as f:
             for line in f:
                 words_arr = get_words_arr(line)
@@ -131,12 +131,11 @@ class feature2id_class:
                         prefix = cword[:n]
                         if (prefix, ctag) not in self.f101_index_dict \
                                 and self.feature_statistics.f101_count_dict[(prefix, ctag)] >= self.threshold:
-                            self.f101_index_dict[(prefix, ctag)] = self.f101_counter
+                            self.f101_index_dict[(prefix, ctag)] = self.f101_counter + self.total_features
                             self.f101_counter += 1
         self.total_features += self.f101_counter
 
     def initialize_f102_index_dict(self, file_path):
-        self.f102_counter = self.total_features
         with open(file_path) as f:
             for line in f:
                 words_arr = get_words_arr(line)
@@ -148,12 +147,11 @@ class feature2id_class:
                         suffix = cword[-n:]
                         if (suffix, ctag) not in self.f102_index_dict \
                                 and self.feature_statistics.f102_count_dict[(suffix, ctag)] >= self.threshold:
-                            self.f101_index_dict[(suffix, ctag)] = self.f102_counter
+                            self.f101_index_dict[(suffix, ctag)] = self.f102_counter + self.total_features
                             self.f102_counter += 1
         self.total_features += self.f102_counter
 
     def initialize_f103_index_dict(self, file_path):
-        self.f103_counter = self.total_features
         with open(file_path) as f:
             for line in f:
                 words_arr = get_words_arr(line)
@@ -165,12 +163,11 @@ class feature2id_class:
                     ctag = word.split('_')[1]
                     if (pptag, ptag, ctag) not in self.f103_index_dict \
                             and self.feature_statistics.f103_count_dict[(pptag, ptag, ctag)] >= self.threshold:
-                        self.f103_index_dict[(pptag, ptag, ctag)] = self.f103_counter
+                        self.f103_index_dict[(pptag, ptag, ctag)] = self.f103_counter + self.total_features
                         self.f103_counter += 1
         self.total_features += self.f103_counter
 
     def initialize_f104_index_dict(self, file_path):
-        self.f104_counter = self.total_features
         with open(file_path) as f:
             for line in f:
                 words_arr = get_words_arr(line)
@@ -180,12 +177,11 @@ class feature2id_class:
                     ctag = word.split('_')[1]
                     if (ptag, ctag) not in self.f104_index_dict \
                             and self.feature_statistics.f104_count_dict[(ptag, ctag)] >= self.threshold:
-                        self.f104_index_dict[(ptag, ctag)] = self.f104_counter
+                        self.f104_index_dict[(ptag, ctag)] = self.f104_counter + self.total_features
                         self.f104_counter += 1
         self.total_features += self.f104_counter
 
     def initialize_f105_index_dict(self, file_path):
-        self.f105_counter = self.total_features
         with open(file_path) as f:
             for line in f:
                 words_arr = get_words_arr(line)
@@ -193,9 +189,16 @@ class feature2id_class:
                     ctag = word.split('_')[1]
                     if ctag not in self.f105_index_dict \
                             and self.feature_statistics.f105_count_dict[ctag] >= self.threshold:
-                        self.f105_index_dict[ctag] = self.f105_counter
+                        self.f105_index_dict[ctag] = self.f105_counter + self.total_features
                         self.f105_counter += 1
         self.total_features += self.f105_counter
+
+    def initialize_f109_index_dict(self, file_path):
+        with open(file_path) as f:
+            for line in f:
+                words_tags_arr = get_words_arr(line)
+                for word_tag in words_tags_arr:
+                    cword, ctag =
 
 
 def represent_history_with_features(history, f100_index_dict, f103_index_dict,
