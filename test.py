@@ -40,8 +40,10 @@ class feature_statistics_class:
                 for word in words_arr:
                     c_word, c_tag = word.split('_')
                     c_word = c_word.lower()
-                    for n in range(1, 4):
-
+                    for n in range(1, 5):
+                        if len(c_word) <= n:
+                            break
+                        add_or_append(self.f101_count_dict, (c_word[:n], c_tag))
 
     def count_f103(self, file_path):
         with open(file_path) as f:
@@ -273,6 +275,11 @@ def add_or_append(dict, item):
         dict[item] = 1
     else:
         dict[item] += 1
+
+
+def parse_lower(word_tag):
+    word, tag = word_tag.split('_')
+    return word.lower(), tag
 
 
 if __name__ == '__main__':
