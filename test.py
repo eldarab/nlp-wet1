@@ -2,6 +2,8 @@ from collections import OrderedDict
 
 BEGIN = '*B'
 STOP = '*S'
+NUMBERS = [str(n) for n in range(10)] + ['zero', 'one', 'two', 'three', 'four', 'five',
+                                         'six', 'seven', 'eight', 'nine', 'ten']
 
 
 class feature_statistics_class:
@@ -13,21 +15,22 @@ class feature_statistics_class:
         self.f103_count_dict = OrderedDict()
         self.f104_count_dict = OrderedDict()
         self.f105_count_dict = OrderedDict()
+        self.f108_count_dict = OrderedDict()
 
     def count_f100(self, file_path):
         with open(file_path) as f:
             for line in f:
-                words_arr = get_words_arr(line)
-                for word in words_arr:
-                    cword, ctag = parse_lower(word)
+                words_tags_arr = get_words_arr(line)
+                for word_tag in words_tags_arr:
+                    cword, ctag = parse_lower(word_tag)
                     add_or_append(self.f100_count_dict, (cword, ctag))
 
     def count_f101(self, file_path):
         with open(file_path) as f:
             for line in f:
-                words_arr = get_words_arr(line)
-                for word in words_arr:
-                    cword, ctag = parse_lower(word)
+                words_tags_arr = get_words_arr(line)
+                for word_tag in words_tags_arr:
+                    cword, ctag = parse_lower(word_tag)
                     for n in range(1, 5):
                         if len(cword) <= n:
                             break
@@ -36,9 +39,9 @@ class feature_statistics_class:
     def count_f102(self, file_path):
         with open(file_path) as f:
             for line in f:
-                words_arr = get_words_arr(line)
-                for word in words_arr:
-                    cword, ctag = parse_lower(word)
+                words_tags_arr = get_words_arr(line)
+                for word_tag in words_tags_arr:
+                    cword, ctag = parse_lower(word_tag)
                     for n in range(1, 5):
                         if len(cword) <= n:
                             break
@@ -47,32 +50,42 @@ class feature_statistics_class:
     def count_f103(self, file_path):
         with open(file_path) as f:
             for line in f:
-                words_arr = get_words_arr(line)
+                words_tags_arr = get_words_arr(line)
                 ptag = BEGIN
                 ctag = BEGIN
-                for word in words_arr:
+                for word_tag in words_tags_arr:
                     pptag = ptag
                     ptag = ctag
-                    ctag = word.split('_')[1]
+                    ctag = word_tag.split('_')[1]
                     add_or_append(self.f103_count_dict, (pptag, ptag, ctag))
 
     def count_f104(self, file_path):
         with open(file_path) as f:
             for line in f:
-                words_arr = get_words_arr(line)
+                words_tags_arr = get_words_arr(line)
                 ctag = BEGIN
-                for word in words_arr:
+                for word_tag in words_tags_arr:
                     ptag = ctag
-                    ctag = word.split('_')[1]
+                    ctag = word_tag.split('_')[1]
                     add_or_append(self.f104_count_dict, (ptag, ctag))
 
     def count_f105(self, file_path):
         with open(file_path) as f:
             for line in f:
-                words_arr = get_words_arr(line)
-                for word in words_arr:
-                    ctag = word.split('_')[1]
+                words_tags_arr = get_words_arr(line)
+                for word_tag in words_tags_arr:
+                    ctag = word_tag.split('_')[1]
                     add_or_append(self.f105_count_dict, ctag)
+
+    def count_f108(self, file_path):
+        with open(file_path) as f:
+            for line in f:
+                words_tags_arr = get_words_arr(line)
+                for word_tag in words_tags_arr:
+                    cword, ctag = word_tag.split(' ')[0], word_tag.split(' ')[1]
+                    if cword in NUMBERS:
+                        add_or_append(self.f108_count_dict, (cword, ctag))
+
 
 
 class feature2id_class:
@@ -87,6 +100,7 @@ class feature2id_class:
         self.f103_counter = 0
         self.f104_counter = 0
         self.f105_counter = 0
+        self.f108_counter = 0
         # Init all features dictionaries
         self.f100_index_dict = OrderedDict()
         self.f101_index_dict = OrderedDict()
@@ -94,13 +108,14 @@ class feature2id_class:
         self.f103_index_dict = OrderedDict()
         self.f104_index_dict = OrderedDict()
         self.f105_index_dict = OrderedDict()
+        self.f108_index_dict = OrderedDict()
 
     def initialize_f100_index_dict(self, file_path):
         with open(file_path) as f:
             for line in f:
-                words_arr = get_words_arr(line)
-                for word in words_arr:
-                    cword, ctag = parse_lower(word)
+                words_tags_arr = get_words_arr(line)
+                for word_tag in words_tags_arr:
+                    cword, ctag = parse_lower(word_tag)
                     if (cword, ctag) not in self.f100_index_dict \
                             and self.feature_statistics.f100_count_dict[(cword, ctag)] >= self.threshold:
                         self.f100_index_dict[(cword, ctag)] = self.f100_counter
@@ -110,9 +125,9 @@ class feature2id_class:
     def initialize_f101_index_dict(self, file_path):
         with open(file_path) as f:
             for line in f:
-                words_arr = get_words_arr(line)
-                for word in words_arr:
-                    cword, ctag = parse_lower(word)
+                words_tags_arr = get_words_arr(line)
+                for word_tag in words_tags_arr:
+                    cword, ctag = parse_lower(word_tag)
                     for n in range(1, 5):
                         if len(cword) <= n:
                             break
@@ -126,9 +141,9 @@ class feature2id_class:
     def initialize_f102_index_dict(self, file_path):
         with open(file_path) as f:
             for line in f:
-                words_arr = get_words_arr(line)
-                for word in words_arr:
-                    cword, ctag = parse_lower(word)
+                words_tags_arr = get_words_arr(line)
+                for word_tag in words_tags_arr:
+                    cword, ctag = parse_lower(word_tag)
                     for n in range(1, 5):
                         if len(cword) <= n:
                             break
@@ -139,17 +154,16 @@ class feature2id_class:
                             self.f102_counter += 1
         self.total_features += self.f102_counter
 
-
     def initialize_f103_index_dict(self, file_path):
         with open(file_path) as f:
             for line in f:
-                words_arr = get_words_arr(line)
+                words_tags_arr = get_words_arr(line)
                 ptag = BEGIN
                 ctag = BEGIN
-                for word in words_arr:
+                for word_tag in words_tags_arr:
                     pptag = ptag
                     ptag = ctag
-                    ctag = word.split('_')[1]
+                    ctag = word_tag.split('_')[1]
                     if (pptag, ptag, ctag) not in self.f103_index_dict \
                             and self.feature_statistics.f103_count_dict[(pptag, ptag, ctag)] >= self.threshold:
                         self.f103_index_dict[(pptag, ptag, ctag)] = self.f103_counter
@@ -159,11 +173,11 @@ class feature2id_class:
     def initialize_f104_index_dict(self, file_path):
         with open(file_path) as f:
             for line in f:
-                words_arr = get_words_arr(line)
+                words_tags_arr = get_words_arr(line)
                 ctag = BEGIN
-                for word in words_arr:
+                for word_tag in words_tags_arr:
                     ptag = ctag
-                    ctag = word.split('_')[1]
+                    ctag = word_tag.split('_')[1]
                     if (ptag, ctag) not in self.f104_index_dict \
                             and self.feature_statistics.f104_count_dict[(ptag, ctag)] >= self.threshold:
                         self.f104_index_dict[(ptag, ctag)] = self.f104_counter
@@ -173,14 +187,26 @@ class feature2id_class:
     def initialize_f105_index_dict(self, file_path):
         with open(file_path) as f:
             for line in f:
-                words_arr = get_words_arr(line)
-                for word in words_arr:
-                    ctag = word.split('_')[1]
+                words_tags_arr = get_words_arr(line)
+                for word_tag in words_tags_arr:
+                    ctag = word_tag.split('_')[1]
                     if ctag not in self.f105_index_dict \
                             and self.feature_statistics.f105_count_dict[ctag] >= self.threshold:
                         self.f105_index_dict[ctag] = self.f105_counter
                         self.f105_counter += 1
         self.total_features += self.f105_counter
+
+    def initialize_f108_index_dict(self, file_path):
+        with open(file_path) as f:
+            for line in f:
+                words_tags_arr = get_words_arr(line)
+                for word_tag in words_tags_arr:
+                    cword, ctag = word_tag.split(' ')[0], word_tag.split(' ')[1]
+                    if (cword, ctag) not in self.f108_index_dict \
+                            and self.feature_statistics.f108_count_dict[(cword, ctag)] >= self.threshold:
+                        self.f108_index_dict[(cword, ctag)] = self.f108_counter + self.total_features
+                        self.f108_counter += 1
+        self.total_features += self.f108_counter
 
 
 def represent_history_with_features(history, f100_index_dict, f103_index_dict,
@@ -217,11 +243,11 @@ def parse_lower(word_tag):
 
 
 def get_words_arr(line):
-    words_arr = line.split(' ')
-    if len(words_arr) == 0:
+    words_tags_arr = line.split(' ')
+    if len(words_tags_arr) == 0:
         return
-    words_arr[-1] = words_arr[-1][:-1]  # removing \n from end of line
-    return words_arr
+    words_tags_arr[-1] = words_tags_arr[-1][:-1]  # removing \n from end of line
+    return words_tags_arr
 
 
 if __name__ == '__main__':
