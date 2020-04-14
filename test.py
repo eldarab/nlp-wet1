@@ -2,6 +2,7 @@ from collections import OrderedDict
 
 BEGIN = '*B'
 STOP = '*S'
+CONTAINS_UPPER = '*CU'
 NUMBERS = [str(n) for n in range(10)] + ['zero', 'one', 'two', 'three', 'four', 'five',
                                          'six', 'seven', 'eight', 'nine', 'ten']
 
@@ -83,10 +84,9 @@ class feature_statistics_class:
             for line in f:
                 words_tags_arr = get_words_arr(line)
                 for word_tag in words_tags_arr:
-                    cword, ctag = word_tag.split(' ')[0], word_tag.split(' ')[1]
+                    cword, ctag = word_tag.split('_')
                     if cword in NUMBERS:
                         add_or_append(self.f108_count_dict, (cword, ctag))
-
 
     def count_f109(self, file_path):
         with open(file_path) as f:
@@ -95,7 +95,7 @@ class feature_statistics_class:
                 for word_tag in words_tags_arr:
                     cword, ctag = word_tag.split('_')
                     if cword[0].isupper() and cword[1:].islower():
-                        add_or_append(self.f109_count_dict, (cword, ctag))
+                        add_or_append(self.f109_count_dict, (CONTAINS_UPPER, ctag))
 
 
 class feature2id_class:
@@ -225,7 +225,13 @@ class feature2id_class:
             for line in f:
                 words_tags_arr = get_words_arr(line)
                 for word_tag in words_tags_arr:
-                    cword, ctag =
+                    cword, ctag = word_tag.split('_')
+                    if cword[0].isupper() and cword[1:].islower():
+                        if (cword, ctag) not in self.f109_index_dict \
+                                and self.feature_statistics.f109_count_dict[(cword, ctag)] >= self.threshold:
+                            self.f109_index_dict[(cword, ctag)] = self.f109_counter + self.total_features
+                            self.f109_counter += 1
+        self.total_features += self.f109_counter
 
 
 def represent_history_with_features(history, f100_index_dict, f103_index_dict,
