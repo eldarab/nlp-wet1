@@ -1,6 +1,5 @@
 from collections import OrderedDict
 
-
 BEGIN = '*B'
 STOP = '*S'
 
@@ -23,12 +22,26 @@ class feature_statistics_class:
                     return
                 words_arr[-1] = words_arr[-1][:-1]  # removing \n from end of line
                 for word in words_arr:
-                    # TODO think about normalizing capital letters (for example "the" and "The")
+                    # TODO normalize capital letters (for example "the" and "The")
                     cur_word, cur_tag = word.split('_')
                     if (cur_word, cur_tag) not in self.f100_count_dict:
                         self.f100_count_dict[(cur_word, cur_tag)] = 1
                     else:
                         self.f100_count_dict[(cur_word, cur_tag)] += 1
+
+    def count_f101(self, file_path):
+        with open(file_path) as f:
+            for line in f:
+                words_arr = line.split(' ')
+                if len(words_arr) == 0:
+                    return
+                words_arr[-1] = words_arr[-1][:-1]
+
+                for word in words_arr:
+                    c_word, c_tag = word.split('_')
+                    c_word = c_word.lower()
+                    for n in range(1, 4):
+
 
     def count_f103(self, file_path):
         with open(file_path) as f:
@@ -61,6 +74,19 @@ class feature_statistics_class:
                     pptag = ptag
                     ptag = ctag
                     ctag = words_arr[i].split('_')[1]
+                    if (pptag, ptag, ctag) not in self.f103_count_dict:
+                        self.f103_count_dict[(pptag, ptag, ctag)] = 1
+                    else:
+                        self.f103_count_dict[(pptag, ptag, ctag)] += 1
+
+                # I think this is does the same thing
+
+                ptag = BEGIN
+                ctag = BEGIN
+                for word in words_arr:
+                    pptag = ptag
+                    ptag = ctag
+                    ctag = word.split('_')[1]
                     if (pptag, ptag, ctag) not in self.f103_count_dict:
                         self.f103_count_dict[(pptag, ptag, ctag)] = 1
                     else:
@@ -242,9 +268,17 @@ def represent_history_with_features(history, f100_index_dict, f103_index_dict,
     return features
 
 
+def add_or_append(dict, item):
+    if item not in dict:
+        dict[item] = 1
+    else:
+        dict[item] += 1
+
+
 if __name__ == '__main__':
     stats = feature_statistics_class()
     stats.count_f100('train1.wtag')
+    stats.count_f101('train1.wtag')
     stats.count_f103('train1.wtag')
     stats.count_f104('train1.wtag')
     stats.count_f105('train1.wtag')
