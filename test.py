@@ -13,6 +13,7 @@ class feature_statistics_class:
         self.f103_count_dict = OrderedDict()
         self.f104_count_dict = OrderedDict()
         self.f105_count_dict = OrderedDict()
+        self.f109_count_dict = OrderedDict()
 
     def count_f100(self, file_path):
         with open(file_path) as f:
@@ -74,6 +75,15 @@ class feature_statistics_class:
                     ctag = word.split('_')[1]
                     add_or_append(self.f105_count_dict, ctag)
 
+    def count_f109(self, file_path):
+        with open(file_path) as f:
+            for line in f:
+                words_tags_arr = get_words_arr(line)
+                for word_tag in words_tags_arr:
+                    cword, ctag = word_tag.split('_')
+                    if cword[0].isupper() and cword[1:].islower():
+                        add_or_append(self.f109_count_dict, (cword, ctag))
+
 
 class feature2id_class:
     def __init__(self, feature_statistics, threshold):
@@ -96,6 +106,7 @@ class feature2id_class:
         self.f105_index_dict = OrderedDict()
 
     def initialize_f100_index_dict(self, file_path):
+        self.f100_counter = self.total_features
         with open(file_path) as f:
             for line in f:
                 words_arr = get_words_arr(line)
@@ -108,6 +119,7 @@ class feature2id_class:
         self.total_features += self.f100_counter
 
     def initialize_f101_index_dict(self, file_path):
+        self.f101_counter = self.total_features
         with open(file_path) as f:
             for line in f:
                 words_arr = get_words_arr(line)
@@ -124,6 +136,7 @@ class feature2id_class:
         self.total_features += self.f101_counter
 
     def initialize_f102_index_dict(self, file_path):
+        self.f102_counter = self.total_features
         with open(file_path) as f:
             for line in f:
                 words_arr = get_words_arr(line)
@@ -139,8 +152,8 @@ class feature2id_class:
                             self.f102_counter += 1
         self.total_features += self.f102_counter
 
-
     def initialize_f103_index_dict(self, file_path):
+        self.f103_counter = self.total_features
         with open(file_path) as f:
             for line in f:
                 words_arr = get_words_arr(line)
@@ -157,6 +170,7 @@ class feature2id_class:
         self.total_features += self.f103_counter
 
     def initialize_f104_index_dict(self, file_path):
+        self.f104_counter = self.total_features
         with open(file_path) as f:
             for line in f:
                 words_arr = get_words_arr(line)
@@ -171,6 +185,7 @@ class feature2id_class:
         self.total_features += self.f104_counter
 
     def initialize_f105_index_dict(self, file_path):
+        self.f105_counter = self.total_features
         with open(file_path) as f:
             for line in f:
                 words_arr = get_words_arr(line)
