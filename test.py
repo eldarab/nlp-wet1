@@ -170,6 +170,7 @@ class feature2id_class:
                             and self.feature_statistics.f103_count_dict[(pptag, ptag, ctag)] >= self.threshold:
                         self.f103_index_dict[(pptag, ptag, ctag)] = self.f103_counter
                         self.f103_counter += 1
+
         self.total_features += self.f103_counter + 1  # TODO feature counter starts from one or zero?
 
     def initialize_f104_index_dict(self, file_path):
@@ -218,19 +219,23 @@ class feature2id_class:
         self.total_features += self.f105_counter + 1  # TODO feature counter starts from one or zero?
 
 
-def represent_history_with_features(history, word_tags_dict):
-    word = history[0]
-    pptag = history[1]
-    ptag = history[2]
-    tag = history[3]
-    nword = history[4]
-    pword = history[5]
+def represent_history_with_features(history, f100_index_dict, f103_index_dict,
+                                    f104_index_dict, f105_index_dict):
+    pword, cword, nword = history[5], history[0], history[4]
+    pptag, ptag, ctag = history[1], history[2], history[3]
     features = []
 
-    if (word, tag) in word_tags_dict:
-        features.append(word_tags_dict[(word, tag)])
+    if (cword, ctag) in f100_index_dict:
+        features.append(f100_index_dict[(cword, ctag)])
 
-    # --- CHECK APEARANCE OF MORE FEATURES BELOW --- #
+    if ctag in f105_index_dict:
+        features.append(f105_index_dict[ctag])
+
+    if (ptag, ctag) in f104_index_dict:
+        features.append(f104_index_dict[(ptag, ctag)])
+
+    if (pptag, ptag, ctag) in f103_index_dict:
+        features.append(f103_index_dict[(pptag, ptag, ctag)])
 
     return features
 
@@ -245,4 +250,7 @@ ids.initialize_f100_index_dict('train1.wtag')
 ids.initialize_f103_index_dict('train1.wtag')
 ids.initialize_f104_index_dict('train1.wtag')
 ids.initialize_f105_index_dict('train1.wtag')
+history1 = ('went', '*B', 'NN', 'VBD', 'Eldar', 'to')
+rep = represent_history_with_features(history1, ids.f100_index_dict, ids.f103_index_dict,
+                                ids.f104_index_dict, ids.f105_index_dict)
 print('')

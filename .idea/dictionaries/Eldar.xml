@@ -2,6 +2,7 @@
   <dictionary name="Eldar">
     <words>
       <w>ctag</w>
+      <w>cword</w>
       <w>nword</w>
       <w>pptag</w>
       <w>ptag</w>
