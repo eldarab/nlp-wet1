@@ -23,7 +23,8 @@ class feature_statistics_class:
                 words_arr[-1] = words_arr[-1][:-1]  # removing \n from end of line
                 for word in words_arr:
                     # TODO normalize capital letters (for example "the" and "The")
-                    cur_word, cur_tag = word.split('_')
+                    # cur_word, cur_tag = word.split('_')
+                    cur_word, cur_tag = parse_lower(word)
                     if (cur_word, cur_tag) not in self.f100_count_dict:
                         self.f100_count_dict[(cur_word, cur_tag)] = 1
                     else:
@@ -38,12 +39,26 @@ class feature_statistics_class:
                 words_arr[-1] = words_arr[-1][:-1]
 
                 for word in words_arr:
-                    c_word, c_tag = word.split('_')
-                    c_word = c_word.lower()
+                    c_word, c_tag = parse_lower(word)
                     for n in range(1, 5):
                         if len(c_word) <= n:
                             break
                         add_or_append(self.f101_count_dict, (c_word[:n], c_tag))
+
+    def count_f102(self, file_path):
+        with open(file_path) as f:
+            for line in f:
+                words_arr = line.split(' ')
+                if len(words_arr) == 0:
+                    return
+                words_arr[-1] = words_arr[-1][:-1]
+
+                for word in words_arr:
+                    c_word, c_tag = parse_lower(word)
+                    for n in range(1, 5):
+                        if len(c_word) <= n:
+                            break
+                        add_or_append(self.f102_count_dict, (c_word[-n:], c_tag))
 
     def count_f103(self, file_path):
         with open(file_path) as f:
@@ -117,6 +132,14 @@ class feature_statistics_class:
                         self.f104_count_dict[(ptag, ctag)] = 1
                     else:
                         self.f104_count_dict[(ptag, ctag)] += 1
+
+                # I think these are equivalent
+
+                ctag = BEGIN
+                for word in words_arr:
+                    ptag = ctag
+                    ctag = word.split('_')[1]
+                    add_or_append(self.f104_count_dict, (ptag, ctag))
 
     def count_f105(self, file_path):
         with open(file_path) as f:
