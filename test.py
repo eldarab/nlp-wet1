@@ -50,11 +50,11 @@ class feature_statistics_class:
                 words_arr[-1] = words_arr[-1][:-1]
 
                 for word in words_arr:
-                    c_word, c_tag = parse_lower(word)
+                    cword, ctag = parse_lower(word)
                     for n in range(1, 5):
-                        if len(c_word) <= n:
+                        if len(cword) <= n:
                             break
-                        add_or_append(self.f102_count_dict, (c_word[-n:], c_tag))
+                        add_or_append(self.f102_count_dict, (cword[-n:], ctag))
 
     def count_f103(self, file_path):
         with open(file_path) as f:
@@ -306,6 +306,7 @@ if __name__ == '__main__':
     stats = feature_statistics_class()
     stats.count_f100('train1.wtag')
     stats.count_f101('train1.wtag')
+    stats.count_f102('train1.wtag')
     stats.count_f103('train1.wtag')
     stats.count_f104('train1.wtag')
     stats.count_f105('train1.wtag')
@@ -317,4 +318,4 @@ if __name__ == '__main__':
     history1 = ('went', '*B', 'NN', 'VBD', 'Eldar', 'to')
     rep = represent_history_with_features(history1, ids.f100_index_dict, ids.f103_index_dict,
                                           ids.f104_index_dict, ids.f105_index_dict)
-    print('')
+    pass
