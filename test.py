@@ -107,6 +107,11 @@ class feature2id_class:
                         self.f100_counter += 1
         self.total_features += self.f100_counter + 1  # TODO feature counter starts from one or zero?
 
+    def initialize_f101_index_dict(self, file_path):
+        with open(file_path) as f:
+            for line in f:
+                words_arr = get_words_arr(line)
+
     def initialize_f103_index_dict(self, file_path):
         with open(file_path) as f:
             for line in f:
