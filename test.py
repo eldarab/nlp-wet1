@@ -2,6 +2,7 @@ from collections import OrderedDict
 
 BEGIN = '*B'
 STOP = '*S'
+CONTAINS_DIGIT = '*CD'
 CONTAINS_UPPER = '*CU'
 NUMBERS = [str(n) for n in range(10)] + ['zero', 'one', 'two', 'three', 'four', 'five',
                                          'six', 'seven', 'eight', 'nine', 'ten']
@@ -84,6 +85,11 @@ class feature_statistics_class:
             for line in f:
                 words_tags_arr = get_words_arr(line)
                 for word_tag in words_tags_arr:
+                    cword, ctag = word_tag.split('_')[0], word_tag.split('_')[1]
+                    for char in cword:
+                        if char.isdigit():
+                            add_or_append(self.f108_count_dict, (CONTAINS_DIGIT, ctag))
+                            break
                     cword, ctag = word_tag.split('_')
                     if cword in NUMBERS:
                         add_or_append(self.f108_count_dict, (cword, ctag))
@@ -213,11 +219,13 @@ class feature2id_class:
             for line in f:
                 words_tags_arr = get_words_arr(line)
                 for word_tag in words_tags_arr:
-                    cword, ctag = word_tag.split(' ')[0], word_tag.split(' ')[1]
-                    if (cword, ctag) not in self.f108_index_dict \
-                            and self.feature_statistics.f108_count_dict[(cword, ctag)] >= self.threshold:
-                        self.f108_index_dict[(cword, ctag)] = self.f108_counter + self.total_features
-                        self.f108_counter += 1
+                    cword, ctag = word_tag.split('_')[0], word_tag.split('_')[1]
+                    for char in cword:
+                        if char.isdigit():
+                            if (CONTAINS_DIGIT, ctag) not in self.f108_index_dict \
+                                    and self.feature_statistics.f108_count_dict[(CONTAINS_DIGIT, ctag)] >= self.threshold:
+                                self.f108_index_dict[(CONTAINS_DIGIT, ctag)] = self.f108_counter + self.total_features
+                                self.f108_counter += 1
         self.total_features += self.f108_counter
 
     def initialize_f109_index_dict(self, file_path):
@@ -283,11 +291,13 @@ if __name__ == '__main__':
     stats.count_f103('train1.wtag')
     stats.count_f104('train1.wtag')
     stats.count_f105('train1.wtag')
+    stats.count_f108('train1.wtag')
     ids = feature2id_class(stats, 4)
     ids.initialize_f100_index_dict('train1.wtag')
     ids.initialize_f103_index_dict('train1.wtag')
     ids.initialize_f104_index_dict('train1.wtag')
     ids.initialize_f105_index_dict('train1.wtag')
+    ids.initialize_f108_index_dict('train1.wtag')
     history1 = ('went', '*B', 'NN', 'VBD', 'Eldar', 'to')
     rep = represent_history_with_features(history1, ids.f100_index_dict, ids.f103_index_dict,
                                           ids.f104_index_dict, ids.f105_index_dict)

@@ -3,11 +3,13 @@
     <words>
       <w>ctag</w>
       <w>cword</w>
+      <w>eldar</w>
       <w>nword</w>
       <w>pptag</w>
       <w>ptag</w>
       <w>pword</w>
       <w>splitted</w>
+      <w>wtag</w>
     </words>
   </dictionary>
 </component>
