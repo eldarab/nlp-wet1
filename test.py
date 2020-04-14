@@ -9,6 +9,8 @@ class feature_statistics_class:
     def __init__(self):
         self.n_total_features = 0  # Total number of features accumulated
         self.f100_count_dict = OrderedDict()  # Init all features dictionaries
+        self.f101_count_dict = OrderedDict()
+        self.f102_count_dict = OrderedDict()
         self.f103_count_dict = OrderedDict()
         self.f104_count_dict = OrderedDict()
         self.f105_count_dict = OrderedDict()
@@ -240,17 +242,18 @@ def represent_history_with_features(history, f100_index_dict, f103_index_dict,
     return features
 
 
-stats = feature_statistics_class()
-stats.count_f100('train1.wtag')
-stats.count_f103('train1.wtag')
-stats.count_f104('train1.wtag')
-stats.count_f105('train1.wtag')
-ids = feature2id_class(stats, 4)
-ids.initialize_f100_index_dict('train1.wtag')
-ids.initialize_f103_index_dict('train1.wtag')
-ids.initialize_f104_index_dict('train1.wtag')
-ids.initialize_f105_index_dict('train1.wtag')
-history1 = ('went', '*B', 'NN', 'VBD', 'Eldar', 'to')
-rep = represent_history_with_features(history1, ids.f100_index_dict, ids.f103_index_dict,
-                                ids.f104_index_dict, ids.f105_index_dict)
-print('')
+if __name__ == '__main__':
+    stats = feature_statistics_class()
+    stats.count_f100('train1.wtag')
+    stats.count_f103('train1.wtag')
+    stats.count_f104('train1.wtag')
+    stats.count_f105('train1.wtag')
+    ids = feature2id_class(stats, 4)
+    ids.initialize_f100_index_dict('train1.wtag')
+    ids.initialize_f103_index_dict('train1.wtag')
+    ids.initialize_f104_index_dict('train1.wtag')
+    ids.initialize_f105_index_dict('train1.wtag')
+    history1 = ('went', '*B', 'NN', 'VBD', 'Eldar', 'to')
+    rep = represent_history_with_features(history1, ids.f100_index_dict, ids.f103_index_dict,
+                                          ids.f104_index_dict, ids.f105_index_dict)
+    print('')
