@@ -4,12 +4,12 @@ BEGIN = '*B'
 STOP = '*S'
 CONTAINS_DIGIT = '*CD'
 CONTAINS_UPPER = '*CU'
-NUMBERS = [str(n) for n in range(10)] + ['zero', 'one', 'two', 'three', 'four', 'five',
-                                         'six', 'seven', 'eight', 'nine', 'ten']
+CONTAINS_HYPHEN = '*CH'
 
 
 class feature_statistics_class:
-    def __init__(self):
+    def __init__(self, file_path):
+        self.file_path = file_path
         self.n_total_features = 0  # Total number of features accumulated
         self.f100_count_dict = OrderedDict()  # Init all features dictionaries
         self.f101_count_dict = OrderedDict()
@@ -20,16 +20,16 @@ class feature_statistics_class:
         self.f108_count_dict = OrderedDict()
         self.f109_count_dict = OrderedDict()
 
-    def count_f100(self, file_path):
-        with open(file_path) as f:
+    def count_f100(self):
+        with open(self.file_path) as f:
             for line in f:
                 words_tags_arr = get_words_arr(line)
                 for word_tag in words_tags_arr:
                     cword, ctag = parse_lower(word_tag)
                     add_or_append(self.f100_count_dict, (cword, ctag))
 
-    def count_f101(self, file_path):
-        with open(file_path) as f:
+    def count_f101(self):
+        with open(self.file_path) as f:
             for line in f:
                 words_tags_arr = get_words_arr(line)
                 for word_tag in words_tags_arr:
@@ -39,8 +39,8 @@ class feature_statistics_class:
                             break
                         add_or_append(self.f101_count_dict, (cword[:n], ctag))
 
-    def count_f102(self, file_path):
-        with open(file_path) as f:
+    def count_f102(self):
+        with open(self.file_path) as f:
             for line in f:
                 words_tags_arr = get_words_arr(line)
                 for word_tag in words_tags_arr:
@@ -50,8 +50,8 @@ class feature_statistics_class:
                             break
                         add_or_append(self.f102_count_dict, (cword[-n:], ctag))
 
-    def count_f103(self, file_path):
-        with open(file_path) as f:
+    def count_f103(self):
+        with open(self.file_path) as f:
             for line in f:
                 words_tags_arr = get_words_arr(line)
                 ptag = BEGIN
@@ -62,8 +62,8 @@ class feature_statistics_class:
                     ctag = word_tag.split('_')[1]
                     add_or_append(self.f103_count_dict, (pptag, ptag, ctag))
 
-    def count_f104(self, file_path):
-        with open(file_path) as f:
+    def count_f104(self):
+        with open(self.file_path) as f:
             for line in f:
                 words_tags_arr = get_words_arr(line)
                 ctag = BEGIN
@@ -72,36 +72,40 @@ class feature_statistics_class:
                     ctag = word_tag.split('_')[1]
                     add_or_append(self.f104_count_dict, (ptag, ctag))
 
-    def count_f105(self, file_path):
-        with open(file_path) as f:
+    def count_f105(self):
+        with open(self.file_path) as f:
             for line in f:
                 words_tags_arr = get_words_arr(line)
                 for word_tag in words_tags_arr:
                     ctag = word_tag.split('_')[1]
                     add_or_append(self.f105_count_dict, ctag)
 
-    def count_f108(self, file_path):
-        with open(file_path) as f:
+    def count_f108(self):
+        with open(self.file_path) as f:
             for line in f:
                 words_tags_arr = get_words_arr(line)
                 for word_tag in words_tags_arr:
                     cword, ctag = word_tag.split('_')[0], word_tag.split('_')[1]
-                    for char in cword:
-                        if char.isdigit():
-                            add_or_append(self.f108_count_dict, (CONTAINS_DIGIT, ctag))
-                            break
-                    cword, ctag = word_tag.split('_')
-                    if cword in NUMBERS:
-                        add_or_append(self.f108_count_dict, (cword, ctag))
+                    if has_digit(cword):
+                        add_or_append(self.f108_count_dict, (CONTAINS_DIGIT, ctag))
 
-    def count_f109(self, file_path):
-        with open(file_path) as f:
+    def count_f109(self):
+        with open(self.file_path) as f:
             for line in f:
                 words_tags_arr = get_words_arr(line)
                 for word_tag in words_tags_arr:
                     cword, ctag = word_tag.split('_')
                     if cword[0].isupper() and cword[1:].islower():
                         add_or_append(self.f109_count_dict, (CONTAINS_UPPER, ctag))
+
+    def count_f110(self):
+        with open(self.file_path) as f:
+            for line in f:
+                words_tags_arr = get_words_arr(line)
+                for word_tag in words_tags_arr:
+                    cword, ctag = word_tag.split('_')[0], word_tag.split('_')[1]
+                    if has_hyphen(cword):
+                        add_or_append(self.f108_count_dict, (CONTAINS_HYPHEN, ctag))
 
 
 class feature2id_class:
@@ -127,6 +131,11 @@ class feature2id_class:
         self.f105_index_dict = OrderedDict()
         self.f108_index_dict = OrderedDict()
         self.f109_index_dict = OrderedDict()
+
+    def set_feature_index(self, key_tuple, feature_index_dict, feature_count_dict, feature_counter):
+        if key_tuple not in feature_index_dict and feature_count_dict[key_tuple] >= self.threshold:
+            feature_index_dict[key_tuple] = feature_counter + self.total_features
+            feature_counter += 1
 
     def initialize_f100_index_dict(self, file_path):
         with open(file_path) as f:
@@ -208,10 +217,13 @@ class feature2id_class:
                 words_tags_arr = get_words_arr(line)
                 for word_tag in words_tags_arr:
                     ctag = word_tag.split('_')[1]
-                    if ctag not in self.f105_index_dict \
-                            and self.feature_statistics.f105_count_dict[ctag] >= self.threshold:
-                        self.f105_index_dict[ctag] = self.f105_counter + self.total_features
-                        self.f105_counter += 1
+                    # TODO advise with Hadar if this is more elegant
+                    self.set_feature_index(ctag, self.f105_index_dict, self.feature_statistics.f105_count_dict,
+                                           self.f105_counter)
+                    # if ctag not in self.f105_index_dict \
+                    #         and self.feature_statistics.f105_count_dict[ctag] >= self.threshold:
+                    #     self.f105_index_dict[ctag] = self.f105_counter + self.total_features
+                    #     self.f105_counter += 1
         self.total_features += self.f105_counter
 
     def initialize_f108_index_dict(self, file_path):
@@ -220,12 +232,11 @@ class feature2id_class:
                 words_tags_arr = get_words_arr(line)
                 for word_tag in words_tags_arr:
                     cword, ctag = word_tag.split('_')[0], word_tag.split('_')[1]
-                    for char in cword:
-                        if char.isdigit():
-                            if (CONTAINS_DIGIT, ctag) not in self.f108_index_dict \
-                                    and self.feature_statistics.f108_count_dict[(CONTAINS_DIGIT, ctag)] >= self.threshold:
-                                self.f108_index_dict[(CONTAINS_DIGIT, ctag)] = self.f108_counter + self.total_features
-                                self.f108_counter += 1
+                    if has_digit(cword):
+                        if (CONTAINS_DIGIT, ctag) not in self.f108_index_dict \
+                                and self.feature_statistics.f108_count_dict[(CONTAINS_DIGIT, ctag)] >= self.threshold:
+                            self.f108_index_dict[(CONTAINS_DIGIT, ctag)] = self.f108_counter + self.total_features
+                            self.f108_counter += 1
         self.total_features += self.f108_counter
 
     def initialize_f109_index_dict(self, file_path):
@@ -263,11 +274,11 @@ def represent_history_with_features(history, f100_index_dict, f103_index_dict,
     return features
 
 
-def add_or_append(dict, item):
-    if item not in dict:
-        dict[item] = 1
+def add_or_append(dictionary, item):
+    if item not in dictionary:
+        dictionary[item] = 1
     else:
-        dict[item] += 1
+        dictionary[item] += 1
 
 
 def parse_lower(word_tag):
@@ -283,9 +294,21 @@ def get_words_arr(line):
     return words_tags_arr
 
 
+def has_digit(word):
+    for char in word:
+        if char.isdigit():
+            return True
+
+
+def has_hyphen(word):
+    for char in word:
+        if char == '-':
+            return True
+
+
 if __name__ == '__main__':
     stats = feature_statistics_class()
-    stats.count_f100('train1.wtag')
+    stats.count_f100()
     stats.count_f101('train1.wtag')
     stats.count_f102('train1.wtag')
     stats.count_f103('train1.wtag')
