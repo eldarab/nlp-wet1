@@ -105,7 +105,7 @@ class feature2id_class:
                             and self.feature_statistics.f100_count_dict[(cword, ctag)] >= self.threshold:
                         self.f100_index_dict[(cword, ctag)] = self.f100_counter
                         self.f100_counter += 1
-        self.total_features += self.f100_counter + 1  # TODO feature counter starts from one or zero?
+        self.total_features += self.f100_counter
 
     def initialize_f103_index_dict(self, file_path):
         with open(file_path) as f:
@@ -121,7 +121,7 @@ class feature2id_class:
                             and self.feature_statistics.f103_count_dict[(pptag, ptag, ctag)] >= self.threshold:
                         self.f103_index_dict[(pptag, ptag, ctag)] = self.f103_counter
                         self.f103_counter += 1
-        self.total_features += self.f103_counter + 1  # TODO feature counter starts from one or zero?
+        self.total_features += self.f103_counter
 
     def initialize_f104_index_dict(self, file_path):
         with open(file_path) as f:
@@ -135,8 +135,7 @@ class feature2id_class:
                             and self.feature_statistics.f104_count_dict[(ptag, ctag)] >= self.threshold:
                         self.f104_index_dict[(ptag, ctag)] = self.f104_counter
                         self.f104_counter += 1
-
-        self.total_features += self.f104_counter + 1  # TODO feature counter starts from one or zero?
+        self.total_features += self.f104_counter
 
     def initialize_f105_index_dict(self, file_path):
         with open(file_path) as f:
@@ -148,7 +147,7 @@ class feature2id_class:
                             and self.feature_statistics.f105_count_dict[ctag] >= self.threshold:
                         self.f105_index_dict[ctag] = self.f105_counter
                         self.f105_counter += 1
-        self.total_features += self.f105_counter + 1  # TODO feature counter starts from one or zero?
+        self.total_features += self.f105_counter
 
 
 def represent_history_with_features(history, f100_index_dict, f103_index_dict,
