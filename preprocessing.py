@@ -113,8 +113,6 @@ class feature_statistics_class:
                         add_or_append(self.f110_count_dict, (CONTAINS_HYPHEN, ctag))
 
 
-
-
 class feature2id_class:
     def __init__(self, file_path, feature_statistics, threshold):
         self.file_path = file_path
@@ -196,7 +194,7 @@ class feature2id_class:
                         suffix = cword[-n:]
                         if (suffix, ctag) not in self.f102_index_dict \
                                 and self.feature_statistics.f102_count_dict[(suffix, ctag)] >= self.threshold:
-                            self.f101_index_dict[(suffix, ctag)] = self.f102_counter + self.total_features
+                            self.f102_index_dict[(suffix, ctag)] = self.f102_counter + self.total_features
                             self.f102_counter += 1
         self.total_features += self.f102_counter
 

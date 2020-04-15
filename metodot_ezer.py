@@ -89,10 +89,10 @@ def calc_features_list(feature_ids, histories_list, ctags_list):
             for i in range(len(histories_list))]
 
 
-def build_features_mat(feature_ids, histories_list, all_tags_list):
-    row_dim = len(histories_list)
+def build_features_mat(feature_ids, all_histories_list, all_tags_list):
+    row_dim = len(all_histories_list)
     col_dim = len(all_tags_list)
-    feature_mat = [[represent_history_with_features(feature_ids, histories_list[i], all_tags_list[j])
+    feature_mat = [[represent_history_with_features(feature_ids, all_histories_list[i], all_tags_list[j])
                     for j in range(col_dim)] for i in range(row_dim)]
     return feature_mat
 

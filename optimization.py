@@ -58,8 +58,8 @@ if __name__ == '__main__':
     # initializing parameters for fmin_l_bfgs_b
     dim = feature2id.total_features
     all_tags_list = feature2id.get_all_tags()
-    all_histories, all_ctags = get_all_histories_ctags(TRAIN_PATH)  # abuse of notation :)
-    features_list = calc_features_list(feature2id, all_histories, all_ctags)
+    all_histories, all_corresponding_tags = get_all_histories_ctags(TRAIN_PATH)  # abuse of notation :)
+    features_list = calc_features_list(feature2id, all_histories, all_corresponding_tags)
     features_matrix = build_features_mat(feature2id, all_histories, all_tags_list)
     reg_lambda = 0
     empirical_counts = calc_empirical_counts(features_list, dim)
