@@ -1,7 +1,6 @@
 from log_linear_memm import Log_Linear_MEMM
 
-if __name__ == '__main__':\
-
+if __name__ == '__main__':
     train_data = 'data/debugging_dataset.wtag'
     model = Log_Linear_MEMM()
     model.fit(train_path=train_data, threshold=10, lam=1)
