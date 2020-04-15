@@ -75,7 +75,7 @@ def represent_history_with_features(feature_ids, history, ctag):
     if has_digit(cword) and (CONTAINS_DIGIT, ctag) in feature_ids.f108_index_dict:
         features.append(feature_ids.f108_index_dict[(CONTAINS_DIGIT, ctag)])
 
-    if not cword.lower() and (CONTAINS_UPPER, ctag) in feature_ids.f109_index_dict:
+    if not cword.islower() and (CONTAINS_UPPER, ctag) in feature_ids.f109_index_dict:
         features.append(feature_ids.f109_index_dict[(CONTAINS_UPPER, ctag)])
 
     if has_hyphen(cword) and (CONTAINS_HYPHEN, ctag) in feature_ids.f110_index_dict:
