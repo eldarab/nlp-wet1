@@ -65,3 +65,6 @@ def memm_viterbi(feature_ids, weights, all_tags, sentence):
         tag_sequence[k] = bp[k+2][(tag_sequence[k+1], tag_sequence[k+2])]
 
     return tag_sequence[1:]
+
+
+
