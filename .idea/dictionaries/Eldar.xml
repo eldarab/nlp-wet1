@@ -2,10 +2,13 @@
   <dictionary name="Eldar">
     <words>
       <w>ctag</w>
+      <w>ctags</w>
       <w>cword</w>
       <w>eldar</w>
       <w>nword</w>
+      <w>pickelim</w>
       <w>pptag</w>
+      <w>preprocessing</w>
       <w>ptag</w>
       <w>pword</w>
       <w>splitted</w>

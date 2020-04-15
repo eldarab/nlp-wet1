@@ -16,6 +16,15 @@ class feature_statistics_class:
         self.f108_count_dict = OrderedDict()  # Contain Number features
         self.f109_count_dict = OrderedDict()  # Contain Uppercase features
         self.f110_count_dict = OrderedDict()  # Contain Hyphen features
+        self.count_f100()
+        self.count_f101()
+        self.count_f102()
+        self.count_f103()
+        self.count_f104()
+        self.count_f105()
+        self.count_f108()
+        self.count_f109()
+        self.count_f110()
 
     def count_f100(self):
         with open(self.file_path) as f:
@@ -105,6 +114,8 @@ class feature_statistics_class:
                         add_or_append(self.f110_count_dict, (CONTAINS_HYPHEN, ctag))
 
 
+
+
 class feature2id_class:
     def __init__(self, file_path, feature_statistics, threshold):
         self.file_path = file_path
@@ -131,11 +142,18 @@ class feature2id_class:
         self.f108_index_dict = OrderedDict()
         self.f109_index_dict = OrderedDict()
         self.f110_index_dict = OrderedDict()
+        self.initialize_f100_index_dict()
+        self.initialize_f101_index_dict()
+        self.initialize_f102_index_dict()
+        self.initialize_f103_index_dict()
+        self.initialize_f104_index_dict()
+        self.initialize_f105_index_dict()
+        self.initialize_f108_index_dict()
+        self.initialize_f109_index_dict()
+        self.initialize_f110_index_dict()
 
-    def set_feature_index(self, key_tuple, feature_index_dict, feature_count_dict, feature_counter):
-        if key_tuple not in feature_index_dict and feature_count_dict[key_tuple] >= self.threshold:
-            feature_index_dict[key_tuple] = feature_counter + self.total_features
-            feature_counter += 1
+    def get_all_tags(self):
+        return [tag for tag in self.f105_index_dict.keys()]
 
     def initialize_f100_index_dict(self):
         with open(self.file_path) as f:
@@ -269,24 +287,6 @@ class feature2id_class:
 if __name__ == '__main__':
     file_path = 'train1.wtag'
     stats = feature_statistics_class(file_path)
-    stats.count_f100()
-    stats.count_f101()
-    stats.count_f102()
-    stats.count_f103()
-    stats.count_f104()
-    stats.count_f105()
-    stats.count_f108()
-    stats.count_f109()
-    stats.count_f110()
     aids = feature2id_class(file_path, stats, 4)
-    aids.initialize_f100_index_dict()
-    aids.initialize_f101_index_dict()
-    aids.initialize_f102_index_dict()
-    aids.initialize_f103_index_dict()
-    aids.initialize_f104_index_dict()
-    aids.initialize_f105_index_dict()
-    aids.initialize_f108_index_dict()
-    aids.initialize_f109_index_dict()
-    aids.initialize_f110_index_dict()
     history1 = ('went', '*B', 'NN', 'VBD', 'Eldar', 'to')
     pass
