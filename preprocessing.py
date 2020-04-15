@@ -6,7 +6,6 @@ from metodot_ezer import *
 class feature_statistics_class:
     def __init__(self, file_path):
         self.file_path = file_path
-        self.n_total_features = 0  # Total number of features accumulated
         self.f100_count_dict = OrderedDict()  # Init all features dictionaries
         self.f101_count_dict = OrderedDict()  # Prefix features
         self.f102_count_dict = OrderedDict()  # Suffix features
