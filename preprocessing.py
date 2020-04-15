@@ -1,5 +1,4 @@
 from collections import OrderedDict
-
 from metodot_ezer import *
 
 
@@ -139,22 +138,56 @@ class feature2id_class:
         self.f108_index_dict = OrderedDict()
         self.f109_index_dict = OrderedDict()
         self.f110_index_dict = OrderedDict()
-        self.initialize_f100_index_dict()
-        self.initialize_f101_index_dict()
-        self.initialize_f102_index_dict()
-        self.initialize_f103_index_dict()
-        self.initialize_f104_index_dict()
-        self.initialize_f105_index_dict()
-        self.initialize_f108_index_dict()
-        self.initialize_f109_index_dict()
-        self.initialize_f110_index_dict()
+
+    def initialize_index_dicts(self, f100=True, f101=True, f102=True, f103=True, f104=True, f105=True, f108=True,
+                               f109=True, f110=True):
+        """
+        Initializes index dictionaries for features given in the list.
+        :param f100: True if f100 should be initialized
+        :param f101: True if f101 should be initialized
+        :param f102: True if f102 should be initialized
+        :param f103: True if f103 should be initialized
+        :param f104: True if f104 should be initialized
+        :param f105: True if f105 should be initialized
+        :param f108: True if f108 should be initialized
+        :param f109: True if f109 should be initialized
+        :param f110: True if f110 should be initialized
+        """
+        if f100:
+            self.initialize_f100_index_dict()
+        if f101:
+            self.initialize_f101_index_dict()
+        if f102:
+            self.initialize_f102_index_dict()
+        if f103:
+            self.initialize_f103_index_dict()
+        if f104:
+            self.initialize_f104_index_dict()
+        if f105:
+            self.initialize_f105_index_dict()
+        if f108:
+            self.initialize_f108_index_dict()
+        if f109:
+            self.initialize_f109_index_dict()
+        if f110:
+            self.initialize_f110_index_dict()
 
     def get_all_tags(self):
         return [tag for tag in self.f105_index_dict.keys()]
 
-    # TODO create this function and put it into use
+    # TODO think again if necessary, seems like it's gonna make some problems
     def get_master_index(self):
-        pass
+        master_index = OrderedDict()
+        master_index.update(self.f100_index_dict)
+        master_index.update(self.f101_index_dict)
+        master_index.update(self.f102_index_dict)
+        master_index.update(self.f103_index_dict)
+        master_index.update(self.f104_index_dict)
+        master_index.update(self.f105_index_dict)
+        master_index.update(self.f108_index_dict)
+        master_index.update(self.f109_index_dict)
+        master_index.update(self.f110_index_dict)
+        return master_index
 
     def initialize_f100_index_dict(self):
         with open(self.file_path) as f:
@@ -283,11 +316,3 @@ class feature2id_class:
                             self.f110_index_dict[(CONTAINS_HYPHEN, ctag)] = self.f110_counter + self.total_features
                             self.f110_counter += 1
         self.total_features += self.f110_counter
-
-
-if __name__ == '__main__':
-    file_path = 'data/train1.wtag'
-    stats = feature_statistics_class(file_path)
-    aids = feature2id_class(file_path, stats, 4)
-    history1 = ('went', '*B', 'NN', 'VBD', 'Eldar', 'to')
-    pass

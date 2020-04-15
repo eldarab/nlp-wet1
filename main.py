@@ -7,6 +7,9 @@ import numpy as np
 from inference import memm_viterbi
 
 
+TRAIN_PATH = 'data/debugging_dataset.wtag'
+
+
 def learn(file_path):
     # preprocessing
     statistics = feature_statistics_class(file_path)
@@ -48,4 +51,10 @@ def predict(file_path):
         optimal_params = pickle.load(f)
     pre_trained_weights = optimal_params[0]
     test = "Hadar went to the mall and bought some eggs ."
-    tags = memm_viterbi(feature2id, pre_trained_weights, feature2id.get_all_tags(), test)
+    return memm_viterbi(feature2id, pre_trained_weights, feature2id.get_all_tags(), test)
+
+
+if __name__ == '__main__':
+    tags = predict(TRAIN_PATH)
+    pass
+

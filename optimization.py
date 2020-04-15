@@ -1,17 +1,21 @@
-import pickle
-
-from metodot_ezer import *
 from preprocessing import *
 from math import exp, log
 from numpy.linalg import norm
-from scipy.optimize import fmin_l_bfgs_b
-
-
-TRAIN_PATH = 'data/train1.wtag'
 
 
 # TODO explain parameters
 def calc_objective_and_grad(v_i, dim, features_list, features_matrix, empirical_counts, reg_lambda):
+    """
+    Generates objective and gradient to use in fmin_l_bfgs_b in a single iteration
+    :param v_i: [[DENSE]] Parameter to optimize at iteration i
+    :param dim: [[SCALAR]] the dimension of the space we optimize in
+    :param features_list: [[SPARSE]] A list of the sparse feature representation of all histories in corpus, i.e. f(xi,yi)
+    :param features_matrix: [[SPARSE]] A matrix containing sparse feature representation of all histories combined with
+    all tags in corpus, i.e. f(xi,y') for each y' in tags
+    :param empirical_counts: [[DENSE]] A dense representation of empirical_counts
+    :param reg_lambda: [[SCALAR]] Hyper-parameter that controls regularization
+    :return: A tuple of the likelihood (objective) and it's gradient to pass to fmin_l_bfgs_b
+    """
     # removed feature_ids and using dim instead
 
     # calculating linear term

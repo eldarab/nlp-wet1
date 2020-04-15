@@ -5,13 +5,17 @@
       <w>ctags</w>
       <w>cword</w>
       <w>eldar</w>
+      <w>iprint</w>
+      <w>maxiter</w>
       <w>nword</w>
       <w>pickelim</w>
       <w>pptag</w>
+      <w>preprocess</w>
       <w>preprocessing</w>
       <w>ptag</w>
       <w>pword</w>
       <w>splitted</w>
+      <w>viterbi</w>
       <w>wtag</w>
     </words>
   </dictionary>
