@@ -9,8 +9,8 @@ from inference import memm_viterbi
 
 
 class Log_Linear_MEMM:
-    def __init__(self, train_path):
-        self.train_path = train_path
+    def __init__(self):
+        self.train_path = None
         self.feature_statistics = None
         self.feature2id = None
         self.weights = None
@@ -45,13 +45,15 @@ class Log_Linear_MEMM:
 
         self.weights = optimal_params[0]
 
-    def fit(self, threshold=10, lam=0):
+    def fit(self, train_path, threshold=10, lam=0):
         """
         A simple interface to train a model.
         Only allows control on model hyper-parameters, no technical bullshit.
+        :param train_path: A path for training data, *.wtag format.
         :param threshold: A threshold for the number of appearances of a parameter in corpus
         :param lam: lambda, regularization constant
         """
+        self.train_path = train_path
         self.preprocess(threshold)
         self.optimize(lam)
 
