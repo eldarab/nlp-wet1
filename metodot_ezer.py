@@ -89,10 +89,23 @@ def calc_features_list(feature_ids, histories_list, ctags_list):
             for i in range(len(histories_list))]
 
 
-def calc_empirical_counts(feature_ids, features_list):
-    dim = feature_ids.total_features
+def build_features_mat(feature_ids, histories_list, all_tags_list):
+    row_dim = len(histories_list)
+    col_dim = len(all_tags_list)
+    feature_mat = [[represent_history_with_features(feature_ids, histories_list[i], all_tags_list[j])
+                    for j in range(col_dim)] for i in range(row_dim)]
+    return feature_mat
+
+
+def calc_empirical_counts(features_list, dim):
     empirical_counts = np.zeros(dim)
     for feature in features_list:
-        for i in feature:
-            empirical_counts[i] += 1
+        empirical_counts += sparse_to_dense(feature, dim)
     return empirical_counts
+
+
+def sparse_to_dense(sparse_vec, dim):
+    dense_vec = np.zeros(dim)
+    for entrance in sparse_vec:
+        dense_vec[entrance] += 1
+    return dense_vec
