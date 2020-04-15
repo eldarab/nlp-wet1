@@ -109,3 +109,36 @@ def sparse_to_dense(sparse_vec, dim):
     for entrance in sparse_vec:
         dense_vec[entrance] += 1
     return dense_vec
+
+
+def get_all_histories_ctags(file_path):
+    with open(file_path) as f:
+        all_histories = []
+        all_ctags = []
+        for line in f:
+            words_tags_arr = get_words_arr(line)
+            if len(words_tags_arr) == 0:
+                continue
+            ptag, ctag = BEGIN, BEGIN
+            cword, nword = BEGIN, words_tags_arr[0][0]
+            for i in range(len(words_tags_arr)):
+                pptag = ptag
+                ptag = ctag
+                ctag = words_tags_arr[i][1]
+                pword = cword
+                cword = words_tags_arr[i][0]
+                if i+1 == len(words_tags_arr):
+                    nword = STOP
+                else:
+                    nword = words_tags_arr[i+1][0]
+                history = (cword, pptag, ptag, pword, nword)
+                all_histories.append(history)
+                all_ctags.append(ctag)
+    return all_histories, all_ctags
+
+
+def get_all_features_list(feature_ids, all_histories_list, all_ctags_list):
+    all_features_list = []
+    for history, ctag in all_histories_list, all_ctags_list:
+        all_features_list.append(represent_history_with_features(feature_ids, history, ctag))
+    return all_features_list
