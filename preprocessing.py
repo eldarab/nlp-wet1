@@ -2,12 +2,6 @@ from collections import OrderedDict
 
 from metodot_ezer import *
 
-BEGIN = '*B'
-STOP = '*S'
-CONTAINS_DIGIT = '*CD'
-CONTAINS_UPPER = '*CU'
-CONTAINS_HYPHEN = '*CH'
-
 
 class feature_statistics_class:
     def __init__(self, file_path):
@@ -272,46 +266,8 @@ class feature2id_class:
         self.total_features += self.f110_counter
 
 
-# TODO change input to feature2id_class instead of this bullshit
-def represent_history_with_features(history, ids):
-    pword, cword, nword = history[5], history[0], history[4]
-    pptag, ptag, ctag = history[1], history[2], history[3]
-    features = []
-
-    if (cword, ctag) in ids.f100_index_dict:
-        features.append(ids.f100_index_dict[(cword, ctag)])
-
-    for n in range(1, 5):
-        if len(cword) <= n:
-            break
-        if (cword[:n], ctag) in ids.f101_index_dict:
-            features.append(ids.f101_index_dict[(cword[:n], ctag)])
-        if (cword[-n:], ctag) in ids.f102_index_dict:
-            features.append(ids.f102_index_dict[(cword[-n:], ctag)])
-
-    if (pptag, ptag, ctag) in ids.f103_index_dict:
-        features.append(ids.f103_index_dict[(pptag, ptag, ctag)])
-
-    if (ptag, ctag) in ids.f104_index_dict:
-        features.append(ids.f104_index_dict[(ptag, ctag)])
-
-    if ctag in ids.f105_index_dict:
-        features.append(ids.f105_index_dict[ctag])
-
-    if has_digit(cword) and (CONTAINS_DIGIT, ctag) in ids.f108_index_dict:
-        features.append(ids.f108_index_dict[(CONTAINS_DIGIT, ctag)])
-
-    if not cword.lower() and (CONTAINS_UPPER, ctag) in ids.f109_index_dict:
-        features.append(ids.f109_index_dict[(CONTAINS_UPPER, ctag)])
-
-    if has_hyphen(cword) and (CONTAINS_HYPHEN, ctag) in ids.f110_index_dict:
-        features.append(ids.f110_index_dict[(CONTAINS_HYPHEN, ctag)])
-
-    return features
-
-
 if __name__ == '__main__':
-    file_path = 'debugging_dataset.wtag'
+    file_path = 'train1.wtag'
     stats = feature_statistics_class(file_path)
     stats.count_f100()
     stats.count_f101()
@@ -333,5 +289,4 @@ if __name__ == '__main__':
     aids.initialize_f109_index_dict()
     aids.initialize_f110_index_dict()
     history1 = ('went', '*B', 'NN', 'VBD', 'Eldar', 'to')
-    rep = represent_history_with_features(history1, aids)
     pass
