@@ -119,18 +119,19 @@ def get_all_histories_ctags(file_path):
             words_tags_arr = get_words_arr(line)
             if len(words_tags_arr) == 0:
                 continue
+            words_tags_split = [word_tag.split('_') for word_tag in words_tags_arr]
             ptag, ctag = BEGIN, BEGIN
-            cword, nword = BEGIN, words_tags_arr[0][0]
-            for i in range(len(words_tags_arr)):
+            cword, nword = BEGIN, words_tags_split[0][0]
+            for i in range(len(words_tags_split)):
                 pptag = ptag
                 ptag = ctag
-                ctag = words_tags_arr[i][1]
+                ctag = words_tags_split[i][1]
                 pword = cword
-                cword = words_tags_arr[i][0]
-                if i+1 == len(words_tags_arr):
+                cword = words_tags_split[i][0]
+                if i+1 == len(words_tags_split):
                     nword = STOP
                 else:
-                    nword = words_tags_arr[i+1][0]
+                    nword = words_tags_split[i+1][0]
                 history = (cword, pptag, ptag, pword, nword)
                 all_histories.append(history)
                 all_ctags.append(ctag)
