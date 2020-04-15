@@ -3,7 +3,7 @@ from math import exp
 from preprocessing import *
 import pickle
 
-TRAIN_PATH = 'debugging_dataset.wtag'
+TRAIN_PATH = 'data/debugging_dataset.wtag'
 
 
 def calc_q(feature_ids, weights, all_tags, pword, cword, nword, pptag, ptag, ctag):
@@ -65,15 +65,3 @@ def memm_viterbi(feature_ids, weights, all_tags, sentence):
         tag_sequence[k] = bp[k+2][(tag_sequence[k+1], tag_sequence[k+2])]
 
     return tag_sequence[1:]
-
-
-if __name__ == '__main__':
-    statistics = feature_statistics_class(TRAIN_PATH)
-    feature2id = feature2id_class(TRAIN_PATH, statistics, threshold=10)
-
-    with open("pickelim/trained_weights_data_i.pkl", 'rb') as f:
-        optimal_params = pickle.load(f)
-    pre_trained_weights = optimal_params[0]
-    test = "Hadar went to the mall and bought some eggs ."
-    tags = memm_viterbi(feature2id, pre_trained_weights, feature2id.get_all_tags(), test)
-    pass

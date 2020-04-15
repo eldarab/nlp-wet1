@@ -286,7 +286,7 @@ class feature2id_class:
 
 
 if __name__ == '__main__':
-    file_path = 'train1.wtag'
+    file_path = 'data/train1.wtag'
     stats = feature_statistics_class(file_path)
     aids = feature2id_class(file_path, stats, 4)
     history1 = ('went', '*B', 'NN', 'VBD', 'Eldar', 'to')
