@@ -1,5 +1,9 @@
 from metodot_ezer import *
 from math import exp
+from preprocessing import *
+import pickle
+
+TRAIN_PATH = 'debugging_dataset.wtag'
 
 
 def calc_q(feature_ids, weights, all_tags, pword, cword, nword, pptag, ptag, ctag):
@@ -14,7 +18,7 @@ def calc_q(feature_ids, weights, all_tags, pword, cword, nword, pptag, ptag, cta
     return numerator / denominator
 
 
-def memm_viterbi(weights, all_tags, sentence):
+def memm_viterbi(feature_ids, weights, all_tags, sentence):
     words_arr = get_words_arr(sentence)
     n = len(words_arr)
 
@@ -23,7 +27,7 @@ def memm_viterbi(weights, all_tags, sentence):
     pi[0][(BEGIN, BEGIN)] = 1
 
     cword, nword = BEGIN, BEGIN
-    for k in range(n):
+    for k in range(1, n+1):
         pword = cword
         cword = nword
         if k < n-1:
@@ -33,17 +37,19 @@ def memm_viterbi(weights, all_tags, sentence):
 
         for v in all_tags:
             if k == 1:
-                pi[1][(BEGIN, v)] = calc_q()
+                pi[1][(BEGIN, v)] = calc_q(feature_ids, weights, all_tags, pword, cword, nword, BEGIN, BEGIN, v)
                 # No need for setting a value for bp because it is only used for k >= 3
             else:
                 for u in all_tags:
                     if k == 2:
-                        pi[2][(u, v)] = pi[1][(BEGIN, u)] * calc_q()
-                        # Not setting value for p
+                        pi[2][(u, v)] = pi[1][(BEGIN, u)] * \
+                                        calc_q(feature_ids, weights, all_tags, pword, cword, nword, BEGIN, u, v)
+                        # Not setting value for bp
                     else:
                         pi[k][(u, v)] = 0
                         for t in all_tags:
-                            if pi[k-1][(t, u)] * calc_q() > pi[k][(u, v)]:
+                            q = calc_q(feature_ids, weights, all_tags, pword, cword, nword, t, u, v)
+                            if pi[k-1][(t, u)] * q > pi[k][(u, v)]:
                                 pi[k][(u, v)] = pi[k-1][(t, u)]
                                 bp[k][(u, v)] = t
 
@@ -59,3 +65,15 @@ def memm_viterbi(weights, all_tags, sentence):
         tag_sequence[k] = bp[k+2][(tag_sequence[k+1], tag_sequence[k+2])]
 
     return tag_sequence[1:]
+
+
+if __name__ == '__main__':
+    statistics = feature_statistics_class(TRAIN_PATH)
+    feature2id = feature2id_class(TRAIN_PATH, statistics, threshold=10)
+
+    with open("pickelim/trained_weights_data_i.pkl", 'rb') as f:
+        optimal_params = pickle.load(f)
+    pre_trained_weights = optimal_params[0]
+    test = "Hadar went to the mall and bought some eggs ."
+    tags = memm_viterbi(feature2id, pre_trained_weights, feature2id.get_all_tags(), test)
+    pass
