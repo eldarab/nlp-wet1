@@ -47,6 +47,7 @@ def has_hyphen(word):
             return True
 
 
+# TODO change this to recieve a master feature index
 def represent_history_with_features(feature_ids, history, ctag):
     pword, cword, nword = history[4], history[0], history[3]
     pptag, ptag = history[1], history[2]

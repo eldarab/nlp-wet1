@@ -152,6 +152,10 @@ class feature2id_class:
     def get_all_tags(self):
         return [tag for tag in self.f105_index_dict.keys()]
 
+    # TODO create this function and put it into use
+    def get_master_index(self):
+        pass
+
     def initialize_f100_index_dict(self):
         with open(self.file_path) as f:
             for line in f:

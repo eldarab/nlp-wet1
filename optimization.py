@@ -7,7 +7,7 @@ from numpy.linalg import norm
 from scipy.optimize import fmin_l_bfgs_b
 
 
-TRAIN_PATH = 'debugging_dataset.wtag'
+TRAIN_PATH = 'train1.wtag'
 
 
 # TODO explain parameters
@@ -66,7 +66,7 @@ if __name__ == '__main__':
 
     args = (dim, features_list, features_matrix, reg_lambda, empirical_counts)
     w_0 = np.random.random(dim)
-    optimal_params = fmin_l_bfgs_b(func=calc_objective_and_grad, x0=w_0, args=args, maxiter=10, iprint=50)
+    optimal_params = fmin_l_bfgs_b(func=calc_objective_and_grad, x0=w_0, args=args, maxiter=1000, iprint=50)
     weights = optimal_params[0]
 
     # running optimization
