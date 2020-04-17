@@ -64,7 +64,7 @@ class Log_Linear_MEMM:
         :param predictions_path: Saves predictions to path if input was a file
         :param input_data: string or file path
         """
-        if input_data[-5:] == '.wtag':
+        if len(input_data) > 5 and input_data[-5:] == '.wtag':
             pass
             # TODO make predictions on entire file and save predictions to predictions_path
         else:

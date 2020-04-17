@@ -1,9 +1,5 @@
-from metodot_ezer import *
 from math import exp
 from preprocessing import *
-import pickle
-
-TRAIN_PATH = 'data/debugging_dataset.wtag'
 
 
 def calc_q(feature_ids, weights, all_tags, pword, cword, nword, pptag, ptag, ctag):
@@ -65,6 +61,3 @@ def memm_viterbi(feature_ids, weights, all_tags, sentence):
         tag_sequence[k] = bp[k+2][(tag_sequence[k+1], tag_sequence[k+2])]
 
     return tag_sequence[1:]
-
-
-
