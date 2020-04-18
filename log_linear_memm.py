@@ -21,6 +21,9 @@ class Log_Linear_MEMM:
             optimal_params = pickle.load(f)
         self.weights = optimal_params[0]
 
+    def set_train_path(self, train_path):
+        self.train_path = train_path
+
     def preprocess(self, threshold=10):
         self.feature_statistics = feature_statistics_class(self.train_path)
         self.feature2id = feature2id_class(self.train_path, self.feature_statistics, threshold)
