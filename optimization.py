@@ -35,6 +35,7 @@ def calc_objective_and_grad(v_i, dim, features_list, features_matrix, empirical_
         normalization_term += log(tmp)  # natural logarithm
 
     # calculating regularization
+    temp = norm(v_i)
     regularization = 0.5 * reg_lambda * (norm(v_i) ** 2)  # l2 norm
 
     #   Gradient Function

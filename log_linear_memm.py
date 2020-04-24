@@ -42,7 +42,7 @@ class Log_Linear_MEMM:
         features_list = calc_features_list(self.feature2id, all_histories, all_corresponding_tags)
         features_matrix = build_features_mat(self.feature2id, all_histories, all_tags_list)
         empirical_counts = calc_empirical_counts(features_list, self.dim)
-        args = (self.dim, features_list, features_matrix, lam, empirical_counts)
+        args = (self.dim, features_list, features_matrix, empirical_counts, lam)
         w_0 = np.random.random(self.dim)
         optimal_params = fmin_l_bfgs_b(func=calc_objective_and_grad, x0=w_0, args=args, maxiter=maxiter, iprint=iprint)
 

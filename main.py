@@ -18,5 +18,6 @@ if __name__ == '__main__':
     model.preprocess(threshold=10)
     model.optimize(lam=1, maxiter=100)
     # model.fit(train_path=train_data, threshold=10, lam=1)
-    prediction = model.predict("Hadar went to the mall and bought some eggs .")
+    # prediction = model.predict("Hadar went to the mall and bought some eggs .")
+    prediction = model.predict(train_data)
     print(prediction)
