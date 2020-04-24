@@ -16,7 +16,7 @@ def calc_objective_and_grad(v_i, dim, features_list, features_matrix, empirical_
     :param reg_lambda: [[SCALAR]] Hyper-parameter that controls regularization
     :return: A tuple of the likelihood (objective) and it's gradient to pass to fmin_l_bfgs_b
     """
-    # removed feature_ids and using dim instead
+    # TODO replace mult_sparse with np arrays or sparse arrays and matrix multiplications
 
     #       Objective Function
 
@@ -24,11 +24,13 @@ def calc_objective_and_grad(v_i, dim, features_list, features_matrix, empirical_
     linear_term = 0
     for feature in features_list:
         linear_term += mult_sparse(v_i, feature)
-    #
-    # linear_term = np.sum(np.)
+
+    # feat_mat is a np array of all of the features from the train data
+    # linear_term = np.sum(v_i @ feat_mat)
 
     # calculating normalization_term
-    # TODO consider implementing using matrix-vector multiplication instead of mult_sprase
+    # TODO consider implementing using matrix-vector multiplication instead of mult_sparse
+    # features matrix can be either a 3 dimensional array or a list of 2 dimensional arrays
     normalization_term = 0
     for history in features_matrix:
         tmp = 0
@@ -37,7 +39,6 @@ def calc_objective_and_grad(v_i, dim, features_list, features_matrix, empirical_
         normalization_term += log(tmp)  # natural logarithm
 
     # calculating regularization
-    temp = norm(v_i)
     regularization = 0.5 * reg_lambda * (norm(v_i) ** 2)  # l2 norm
 
     #       Gradient Function
