@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PublishConfigData">
+    <serverData>
+      <paths name="student@nlp2019s-0017.eastus.cloudapp.azure.com:22">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/home/student/homework/tmp" local="$PROJECT_DIR$" />
+            <mapping />
+          </mappings>
+        </serverdata>
+      </paths>
+    </serverData>
+  </component>
+</project>
