@@ -50,9 +50,10 @@ def has_hyphen(word):
 # TODO change this to receive a master feature index
 # def represent_history_with_features(feature_ids, sentence, i, pptag, ptag, ctag):
 def represent_history_with_features(feature_ids, history, ctag):
-    pword, cword, nword = history[4], history[0], history[3]
+    pword, cword, nword = history[4].lower(), history[0].lower(), history[3].lower()
     pptag, ptag = history[1], history[2]
     features = []
+    has_upper = not history[0].islower()
 
     if (cword, ctag) in feature_ids.f100_index_dict:
         features.append(feature_ids.f100_index_dict[(cword, ctag)])
@@ -78,7 +79,7 @@ def represent_history_with_features(feature_ids, history, ctag):
         features.append(feature_ids.f108_index_dict[(CONTAINS_DIGIT, ctag)])
 
     # if not cword.islower() and (CONTAINS_UPPER, ctag) in feature_ids.f109_index_dict:
-    if not cword.islower() and (CONTAINS_UPPER, ctag) in feature_ids.f109_index_dict:
+    if has_upper and (CONTAINS_UPPER, ctag) in feature_ids.f109_index_dict:
         features.append(feature_ids.f109_index_dict[(CONTAINS_UPPER, ctag)])
 
     if has_hyphen(cword) and (CONTAINS_HYPHEN, ctag) in feature_ids.f110_index_dict:
