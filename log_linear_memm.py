@@ -67,16 +67,14 @@ class Log_Linear_MEMM:
         :param predictions_path: Saves predictions to path if input was a file
         :param input_data: string or file path
         """
-        if len(input_data) > 5 and input_data[-5:] == '.wtag':
+        if len(input_data) > 4 and input_data[-4:] == '.txt':
             with open(input_data, 'r') as in_file:
-                with open(input_data[:-5] + '_predictions.txt', 'w') as out_file:
+                with open(input_data[:-4] + '_predictions.txt', 'w') as out_file:
                     for line in in_file:
                         words = line.split()
-                        predictions = memm_viterbi(self.feature2id, self.weights, self.feature2id.get_all_tags(),
-                                                   input_data)
+                        predictions = memm_viterbi(self.feature2id, self.weights, self.feature2id.get_all_tags(), line)
                         for word, pred in zip(words, predictions):
                             out_file.write(word + '_' + pred + ' ')
-                        
 
         else:
             return memm_viterbi(self.feature2id, self.weights, self.feature2id.get_all_tags(), input_data)

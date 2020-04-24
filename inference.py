@@ -54,11 +54,12 @@ def memm_viterbi(feature_ids, weights, all_tags, sentence):
 
     tag_sequence = [None for i in range(n+1)]
     max_prob = 0
-    for u in all_tags:
-        for v in all_tags:
-            if pi[n][(u, v)] > max_prob:
-                max_prob = pi[n][(u, v)]
-                tag_sequence[n-1], tag_sequence[n] = u, v
+    # for u in all_tags:
+    #     for v in all_tags:
+    for u, v in pi[n].keys():
+        if pi[n][(u, v)] > max_prob:
+            max_prob = pi[n][(u, v)]
+            tag_sequence[n-1], tag_sequence[n] = u, v
 
     for k in range(n-2, 0, -1):
         tag_sequence[k] = bp[k+2][(tag_sequence[k+1], tag_sequence[k+2])]

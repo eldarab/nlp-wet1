@@ -24,7 +24,8 @@ def calc_objective_and_grad(v_i, dim, features_list, features_matrix, empirical_
     linear_term = 0
     for feature in features_list:
         linear_term += mult_sparse(v_i, feature)
-    # linear_term += mult_sparse(v_i, feature)
+    #
+    # linear_term = np.sum(np.)
 
     # calculating normalization_term
     # TODO consider implementing using matrix-vector multiplication instead of mult_sprase
