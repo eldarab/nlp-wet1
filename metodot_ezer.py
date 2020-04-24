@@ -48,7 +48,7 @@ def has_hyphen(word):
 
 
 # TODO change this to receive a master feature index
-# def represent_history_with_features(feature_ids, sentance, i, pptag, ptag, ctag):
+# def represent_history_with_features(feature_ids, sentence, i, pptag, ptag, ctag):
 def represent_history_with_features(feature_ids, history, ctag):
     pword, cword, nword = history[4], history[0], history[3]
     pptag, ptag = history[1], history[2]
@@ -77,6 +77,7 @@ def represent_history_with_features(feature_ids, history, ctag):
     if has_digit(cword) and (CONTAINS_DIGIT, ctag) in feature_ids.f108_index_dict:
         features.append(feature_ids.f108_index_dict[(CONTAINS_DIGIT, ctag)])
 
+    # if not cword.islower() and (CONTAINS_UPPER, ctag) in feature_ids.f109_index_dict:
     if not cword.islower() and (CONTAINS_UPPER, ctag) in feature_ids.f109_index_dict:
         features.append(feature_ids.f109_index_dict[(CONTAINS_UPPER, ctag)])
 
@@ -87,7 +88,7 @@ def represent_history_with_features(feature_ids, history, ctag):
 
 
 def calc_features_list(feature_ids, histories_list, ctags_list):
-    return [represent_history_with_features(feature_ids, histories_list[i], ctags_list[i]) \
+    return [represent_history_with_features(feature_ids, histories_list[i], ctags_list[i])
             for i in range(len(histories_list))]
 
 

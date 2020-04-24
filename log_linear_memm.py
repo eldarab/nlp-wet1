@@ -34,11 +34,13 @@ class Log_Linear_MEMM:
         # initializing parameters for fmin_l_bfgs_b
         # all_tags_list = get_all_tags(self.train_path)
         all_tags_list = self.feature2id.get_all_tags()
+
+        master = self.feature2id.get_master_index()
+
         all_histories, all_corresponding_tags = get_all_histories_ctags(self.train_path)  # abuse of notation :)
         features_list = calc_features_list(self.feature2id, all_histories, all_corresponding_tags)
         features_matrix = build_features_mat(self.feature2id, all_histories, all_tags_list)
         empirical_counts = calc_empirical_counts(features_list, self.dim)
-
         args = (self.dim, features_list, features_matrix, lam, empirical_counts)
         w_0 = np.random.random(self.dim)
         optimal_params = fmin_l_bfgs_b(func=calc_objective_and_grad, x0=w_0, args=args, maxiter=maxiter, iprint=iprint)
