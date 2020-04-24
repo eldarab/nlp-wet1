@@ -18,12 +18,13 @@ def calc_objective_and_grad(v_i, dim, features_list, features_matrix, empirical_
     """
     # removed feature_ids and using dim instead
 
-    #   Objective Function
+    #       Objective Function
 
     # calculating linear term
     linear_term = 0
     for feature in features_list:
         linear_term += mult_sparse(v_i, feature)
+    # linear_term += mult_sparse(v_i, feature)
 
     # calculating normalization_term
     # TODO consider implementing using matrix-vector multiplication instead of mult_sprase
@@ -38,7 +39,7 @@ def calc_objective_and_grad(v_i, dim, features_list, features_matrix, empirical_
     temp = norm(v_i)
     regularization = 0.5 * reg_lambda * (norm(v_i) ** 2)  # l2 norm
 
-    #   Gradient Function
+    #       Gradient Function
 
     # calculating expected_counts
     expected_counts = 0
