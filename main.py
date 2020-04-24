@@ -20,3 +20,4 @@ if __name__ == '__main__':
     model.optimize(lam=0, maxiter=100, weights_path='dumps/weights_24-04-2020.pkl')
     prediction = model.predict('The Treasury is still working out the details with bank trade associations and the other government agencies that have a hand in fighting money laundering .')
     print(prediction)
+
