@@ -9,6 +9,7 @@ def clean_predictions(input_data):
                 for word_tag in words_tags:
                     word = word_tag.split('_')[0]
                     out_file.write(word + ' ')
+                    #toodldo
 
 
 if __name__ == '__main__':
