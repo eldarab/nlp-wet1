@@ -18,6 +18,8 @@ def calc_objective_and_grad(v_i, dim, features_list, features_matrix, empirical_
     """
     # removed feature_ids and using dim instead
 
+    #   Objective Function
+
     # calculating linear term
     linear_term = 0
     for feature in features_list:
@@ -34,6 +36,8 @@ def calc_objective_and_grad(v_i, dim, features_list, features_matrix, empirical_
 
     # calculating regularization
     regularization = 0.5 * reg_lambda * (norm(v_i) ** 2)  # l2 norm
+
+    #   Gradient Function
 
     # calculating expected_counts
     expected_counts = 0

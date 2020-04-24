@@ -1,7 +1,7 @@
 from log_linear_memm import Log_Linear_MEMM
 
 if __name__ == '__main__':
-    train_data = 'data/train1.wtag'
+    train_data = 'data/debugging_dataset.wtag'
     model = Log_Linear_MEMM()
     model.set_train_path(train_data)
     model.preprocess(threshold=10)

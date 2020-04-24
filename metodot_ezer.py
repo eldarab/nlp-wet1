@@ -47,8 +47,8 @@ def has_hyphen(word):
             return True
 
 
-# TODO change this to recieve a master feature index
-#def represent_history_with_features(feature_ids, sentance, i, pptag, ptag, ctag)
+# TODO change this to receive a master feature index
+# def represent_history_with_features(feature_ids, sentance, i, pptag, ptag, ctag):
 def represent_history_with_features(feature_ids, history, ctag):
     pword, cword, nword = history[4], history[0], history[3]
     pptag, ptag = history[1], history[2]
@@ -145,3 +145,14 @@ def get_all_features_list(feature_ids, all_histories_list, all_ctags_list):
     for history, ctag in all_histories_list, all_ctags_list:
         all_features_list.append(represent_history_with_features(feature_ids, history, ctag))
     return all_features_list
+
+
+def get_all_tags(file_path):
+    tags = []
+    with open(file_path, 'r') as f:
+        for line in f:
+            for word_tag in line.split():
+                tag = word_tag.split('_')[1]
+                if tag not in tags:
+                    tags.append(tag)
+    return tags

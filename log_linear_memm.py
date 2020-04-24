@@ -32,6 +32,7 @@ class Log_Linear_MEMM:
 
     def optimize(self, lam=0, maxiter=1000, iprint=1, save_weights=True, weights_path='dumps/weights.pkl'):
         # initializing parameters for fmin_l_bfgs_b
+        # all_tags_list = get_all_tags(self.train_path)
         all_tags_list = self.feature2id.get_all_tags()
         all_histories, all_corresponding_tags = get_all_histories_ctags(self.train_path)  # abuse of notation :)
         features_list = calc_features_list(self.feature2id, all_histories, all_corresponding_tags)
