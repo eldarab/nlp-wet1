@@ -14,15 +14,27 @@ class feature_statistics_class:
         self.f108_count_dict = OrderedDict()  # Contain Number features
         self.f109_count_dict = OrderedDict()  # Contain Uppercase features
         self.f110_count_dict = OrderedDict()  # Contain Hyphen features
-        self.count_f100()
-        self.count_f101()
-        self.count_f102()
-        self.count_f103()
-        self.count_f104()
-        self.count_f105()
-        self.count_f108()
-        self.count_f109()
-        self.count_f110()
+
+    def count_features(self, f100=True, f101=True, f102=True, f103=True, f104=True, f105=True, f108=True,
+                       f109=True, f110=True):
+        if f100:
+            self.count_f100()
+        if f101:
+            self.count_f101()
+        if f102:
+            self.count_f102()
+        if f103:
+            self.count_f103()
+        if f104:
+            self.count_f104()
+        if f105:
+            self.count_f105()
+        if f108:
+            self.count_f108()
+        if f109:
+            self.count_f109()
+        if f110:
+            self.count_f110()
 
     def count_f100(self):
         with open(self.file_path) as f:
