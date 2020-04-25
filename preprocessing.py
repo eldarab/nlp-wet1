@@ -11,6 +11,7 @@ class feature_statistics_class:
         self.f103_count_dict = OrderedDict()  # Trigram features
         self.f104_count_dict = OrderedDict()  # Bigram features
         self.f105_count_dict = OrderedDict()  # Unigram features
+        # Remember to add new features to count_features, initialize_index_dict, and preprocess (in log_linear_memm)
         self.f108_count_dict = OrderedDict()  # Contain Number features
         self.f109_count_dict = OrderedDict()  # Contain Uppercase features
         self.f110_count_dict = OrderedDict()  # Contain Hyphen features
@@ -185,9 +186,12 @@ class feature2id_class:
             self.initialize_f110_index_dict()
 
     def get_all_tags(self):
+        """
+        A quick way to access all tags the model "knows", i.e. passed threshold.
+        :return: List of tags
+        """
         return [tag for tag in self.f105_index_dict.keys()]
 
-    # TODO think again if necessary, seems like it's gonna make some problems
     def get_master_index(self):
         master_index = OrderedDict()
         master_index.update(self.f100_index_dict)

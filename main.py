@@ -13,12 +13,12 @@ def clean_predictions(input_data):
 
 
 if __name__ == '__main__':
-    train_data = 'data/train1.wtag'
+    train_data = 'data/debugging_dataset_200.wtag'
     model = Log_Linear_MEMM()
     model.set_train_path(train_data)
-    model.preprocess(threshold=10, f100=True, f101=True, f102=True, f103=True, f104=True, f105=True,
+    model.preprocess(threshold=10, f100=True, f101=False, f102=False, f103=True, f104=True, f105=True,
                      f108=False, f109=False, f110=False)
-    model.optimize(lam=1, maxiter=10, weights_path='dumps/weights_25-04-2020.pkl')
+    model.optimize(lam=1, maxiter=10, weights_path='dumps/weights_25-04-2020-1330.pkl')
     prediction = model.predict('The Treasury is still working out the details with bank trade associations and the other government agencies that have a hand in fighting money laundering .')
     print(prediction)
 
