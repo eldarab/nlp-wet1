@@ -28,12 +28,12 @@ def parse_lower(word_tag):
     return word.lower(), tag
 
 
-# TODO condition on \n at the end of the sentence
 def get_words_arr(line):
     words_tags_arr = line.split(' ')
     if len(words_tags_arr) == 0:
         raise Exception("get_words_arr got an empty sentence.")
-    words_tags_arr[-1] = words_tags_arr[-1][:-1]  # removing \n from end of line
+    if words_tags_arr[-1][-2:] == '\n':
+        words_tags_arr[-1] = words_tags_arr[-1][:-1]  # removing \n from end of line
     return words_tags_arr
 
 

@@ -2,7 +2,7 @@ from log_linear_memm import Log_Linear_MEMM
 from time import strftime
 from emailer import send_email
 
-
+# TODO do not lehagish
 def clean_predictions(input_data):
     with open(input_data, 'r') as in_file:
         with open(input_data[:-5] + '_clean.txt', 'w') as out_file:
