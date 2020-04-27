@@ -16,19 +16,23 @@ def clean_predictions(input_data):
 
 if __name__ == '__main__':
     start_time = strftime("%Y-%m-%d_%H-%M-%S")
-    train_data = 'data/debugging_dataset_200.wtag'
+    train_data = 'data/debugging_dataset_1.wtag'
     model = Log_Linear_MEMM()
     model.set_train_path(train_data)
-    model.preprocess(threshold=10, f100=True, f101=False, f102=False, f103=True, f104=True, f105=True,
-                     f108=False, f109=False, f110=False)
+    model.preprocess(threshold=0, f100=True, f101=False, f102=False, f103=True,
+                     f104=True, f105=True, f108=False, f109=False, f110=False)
     preprocess_time = strftime("%Y-%m-%d_%H-%M-%S")
-    model.optimize(lam=1, maxiter=10, weights_path='dumps/weights_' + start_time + '.pkl')
+    model.optimize(lam=0, maxiter=10, weights_path='dumps/weights_' + start_time + '.pkl')
     optimization_time = strftime("%Y-%m-%d_%H-%M-%S")
     # prediction = model.predict('The Treasury is still working out the details with bank trade associations \
     # and the other government agencies that have a hand in fighting money laundering .')
-    prediction = model.predict('The Treasury is still working the .')
+    prediction = model.predict('The Treasury is still working the .\n')
     print(prediction)
     prediction_time = strftime("%Y-%m-%d_%H-%M-%S")
     message_body = 'Start: ' + start_time + '\nPreprocess end: ' + preprocess_time + '\nOptimization end: ' + \
                    optimization_time + '\nPrediction end: ' + prediction_time
-    send_email('eldar.abraham@gmail.com', '<password>', ['eldar.a@campus.technion.ac.il'], message_body)
+    # send_email('eldar.abraham@gmail.com', '<my penis>', ['eldar.a@campus.technion.ac.il'], message_body)
+    # model.load_weights('dumps/weights.pkl')
+
+    # prediction = model.predict('The Treasury is still working out the details with bank trade associations and the other government agencies that have a hand in fighting money laundering .')
+    # print(prediction)
