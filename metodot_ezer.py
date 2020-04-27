@@ -1,5 +1,5 @@
 import numpy as np
-
+from re import search
 from tqdm import tqdm
 
 BEGIN = '*B'
@@ -38,15 +38,11 @@ def get_words_arr(line):
 
 
 def has_digit(word):
-    for char in word:
-        if char.isdigit():
-            return True
+    return bool(search(r'\d', word))
 
 
 def has_hyphen(word):
-    for char in word:
-        if char == '-':
-            return True
+    return bool(search('-', word))
 
 
 # TODO change this to receive a master feature index
@@ -80,7 +76,6 @@ def represent_history_with_features(feature_ids, history, ctag):
     if has_digit(cword) and (CONTAINS_DIGIT, ctag) in feature_ids.f108_index_dict:
         features.append(feature_ids.f108_index_dict[(CONTAINS_DIGIT, ctag)])
 
-    # if not cword.islower() and (CONTAINS_UPPER, ctag) in feature_ids.f109_index_dict:
     if has_upper and (CONTAINS_UPPER, ctag) in feature_ids.f109_index_dict:
         features.append(feature_ids.f109_index_dict[(CONTAINS_UPPER, ctag)])
 

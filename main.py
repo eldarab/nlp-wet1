@@ -2,6 +2,7 @@ from log_linear_memm import Log_Linear_MEMM
 from time import strftime
 from emailer import send_email
 
+
 # TODO do not lehagish
 def clean_predictions(input_data):
     with open(input_data, 'r') as in_file:
@@ -27,9 +28,9 @@ if __name__ == '__main__':
     optimization_time = strftime("%Y-%m-%d_%H-%M-%S")
     model.load_weights('dumps/weights_2020-04-27_15-19-14.pkl')
     prediction = model.predict('data/debugging_dataset_201_210_clean.txt')
-    # print(prediction)
     prediction_time = strftime("%Y-%m-%d_%H-%M-%S")
     message_body = 'Start: ' + start_time + '\nPreprocess end: ' + preprocess_time + '\nOptimization end: ' + \
                    optimization_time + '\nPrediction end: ' + prediction_time
+
     # send_email('eldar.abraham@gmail.com', '<my penis>', ['eldar.a@campus.technion.ac.il'], message_body)
     # model.load_weights('dumps/weights.pkl')
