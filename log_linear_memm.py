@@ -25,12 +25,12 @@ class Log_Linear_MEMM:
     def set_train_path(self, train_path):
         self.train_path = train_path
 
-    def preprocess(self, threshold=10, f100=True, f101=True, f102=True, f103=True, f104=True, f105=True, f108=True,
-                   f109=True, f110=True):
+    def preprocess(self, threshold=10, f100=True, f101=True, f102=True, f103=True, f104=True, f105=True, f106=True,
+                   f107=True, f108=True, f109=True, f110=True):
         self.feature_statistics = FeatureStatisticsClass(self.train_path)
-        self.feature_statistics.count_features(f100, f101, f102, f103, f104, f105, f108, f109, f110)
+        self.feature_statistics.count_features(f100, f101, f102, f103, f104, f105, f106, f107, f108, f109, f110)
         self.feature2id = Feature2Id(self.train_path, self.feature_statistics, threshold)
-        self.feature2id.initialize_index_dicts(f100, f101, f102, f103, f104, f105, f108, f109, f110)
+        self.feature2id.initialize_index_dicts(f100, f101, f102, f103, f104, f105, f106, f107, f108, f109, f110)
         self.dim = self.feature2id.total_features
 
     def optimize(self, lam=0, maxiter=1000, iprint=1, save_weights=True, weights_path='dumps/weights.pkl'):

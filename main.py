@@ -23,25 +23,24 @@ if __name__ == '__main__':
     model.set_train_path(train_data)
 
     #   Preprocessing
-    model.preprocess(threshold=100, f100=True, f101=True, f102=True, f103=True,
-                     f104=True, f105=True, f108=True, f109=True, f110=True)
+    model.preprocess(threshold=10)
     preprocess_time = strftime("%Y-%m-%d_%H-%M-%S")
 
     #   Optimizing
-    # model.optimize(lam=1, maxiter=100, weights_path='dumps/weights_' + start_time + '.pkl')
+    model.optimize(lam=5, maxiter=50, weights_path='dumps/weights_' + start_time + '.pkl')
     optimization_time = strftime("%Y-%m-%d_%H-%M-%S")
 
     #   Load pre-trained weights
-    model.load_weights('dumps/weights_2020-04-30_16-08-58.pkl')
+    # model.load_weights('dumps/weights_2020-04-30_17-52-58.pkl')
 
     #   Predict
     # TODO evaluate with different beam sizes
-    prediction = model.predict('data/debugging_dataset_10_clean.txt')
+    prediction = model.predict('data/debugging_dataset_201_210_clean.txt')
     prediction_time = strftime("%Y-%m-%d_%H-%M-%S")
 
     #  Evaluate
     print(accuracy('data/debugging_dataset_201_210.wtag', 'data/debugging_dataset_201_210_clean_predictions.txt'))
-    print(cm('data/debugging_dataset_201_210.wtag', 'data/debugging_dataset_201_210_clean_predictions.txt'))
+    # print(cm('data/debugging_dataset_201_210.wtag', 'data/debugging_dataset_201_210_clean_predictions.txt'))
 
     #  End message
     # message_body = 'Start: ' + start_time + '\nPreprocess end: ' + preprocess_time + '\nOptimization end: ' + \

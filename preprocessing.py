@@ -32,6 +32,10 @@ class FeatureStatisticsClass:
             self.count_f104()
         if f105:
             self.count_f105()
+        if f106:
+            self.count_f106()
+        if f107:
+            self.count_f107()
         if f108:
             self.count_f108()
         if f109:
@@ -107,11 +111,11 @@ class FeatureStatisticsClass:
                 for i in range(n):
                     if skip_end and i == n-1:
                         continue
-                    pword = words_tags_arr[i].split('_')[0]
+                    pword = words_tags_arr[i].split('_')[0].lower()
                     ctag = words_tags_arr[i+1].split('_')[1] if i < n-1 else STOP
                     add_or_append(self.f106_count_dict, (pword, ctag))
                     
-    def count_f107(self, skip_start=True):
+    def count_f107(self, skip_start=False):
         with open(self.file_path) as f:
             for line in f:
                 words_tags_arr = get_words_arr(line)
@@ -119,7 +123,7 @@ class FeatureStatisticsClass:
                 for i in range(n):
                     if skip_start and i == 0:
                         continue
-                    nword = words_tags_arr[i].split('_')[0]
+                    nword = words_tags_arr[i].split('_')[0].lower()
                     ctag = words_tags_arr[i-1].split('_')[1] if i > 0 else BEGIN
                     add_or_append(self.f107_count_dict, (nword, ctag))
 
@@ -335,7 +339,7 @@ class Feature2Id:
                 for i in range(n):
                     if skip_end and i == n-1:
                         continue
-                    pword = words_tags_arr[i].split('_')[0]
+                    pword = words_tags_arr[i].split('_')[0].lower()
                     ctag = words_tags_arr[i+1].split('_')[1] if i < n-1 else STOP
                     if (pword, ctag) not in self.f106_index_dict \
                             and self.feature_statistics.f106_count_dict[(pword, ctag)] >= self.threshold:
@@ -351,8 +355,8 @@ class Feature2Id:
                 for i in range(n):
                     if skip_start and i == 0:
                         continue
-                    nword = words_tags_arr[i].split('_')[0]
-                    ctag = words_tags_arr[i-1].split('_')[1] if i > 0 else STOP
+                    nword = words_tags_arr[i].split('_')[0].lower()
+                    ctag = words_tags_arr[i-1].split('_')[1] if i > 0 else BEGIN
                     if (nword, ctag) not in self.f107_index_dict \
                             and self.feature_statistics.f107_count_dict[(nword, ctag)] >= self.threshold:
                         self.f107_index_dict[(nword, ctag)] = self.f107_counter + self.total_features
