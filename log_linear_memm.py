@@ -17,6 +17,9 @@ class Log_Linear_MEMM:
         self.weights = None
         self.dim = None
 
+    def get_all_tags(self):
+        return self.feature2id.get_all_tags()
+
     def load_weights(self, weights_path='dumps/weights.pkl'):
         with open(weights_path, 'rb') as f:
             optimal_params = pickle.load(f)
@@ -62,7 +65,7 @@ class Log_Linear_MEMM:
         self.preprocess(threshold)
         self.optimize(lam)
 
-    def predict(self, input_data, predictions_path='predictions/predictions.wtag', beam_size=5):
+    def predict(self, input_data, beam_size=5):
         """
         Generates a prediction for a given input. Input can be either a sentence (string) or a file path.
         File has to be in *.wtag format.
@@ -80,6 +83,7 @@ class Log_Linear_MEMM:
                                                    line, beam_size)
                         for word, pred in zip(words, predictions):
                             out_file.write(word + '_' + pred + ' ')
+                        out_file.write('\n')
 
         else:
             return memm_viterbi(self.feature2id, self.weights, self.feature2id.get_all_tags(), input_data, beam_size)

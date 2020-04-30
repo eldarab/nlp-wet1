@@ -48,7 +48,7 @@ def get_line_tags(line):
     return tags
 
 
-def get_all_labels(file):
+def get_file_tags(file):
     with open(file, 'r') as file:
         labels = []
         for line in file:
