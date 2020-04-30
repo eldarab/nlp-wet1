@@ -55,7 +55,7 @@ def has_hyphen(word):
     # return bool(search('-', word))
 
 
-# TODO change this to receive a master feature index
+# TODO consider changing this to receive a master feature index
 # def represent_history_with_features(feature_ids, sentence, i, pptag, ptag, ctag):
 def represent_history_with_features(feature_ids, history, ctag):
     pword, cword, nword = history[4].lower(), history[0].lower(), history[3].lower()
