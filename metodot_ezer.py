@@ -37,12 +37,22 @@ def get_words_arr(line):
     return words_tags_arr
 
 
+# TODO check which implementation is faster
 def has_digit(word):
-    return bool(search(r'\d', word))
+    for char in word:
+        if char.isdigit():
+            return True
+    # return any(char.isdigit() for char in word)
+    # return bool(search(r'\d', word))
 
 
+# TODO check which implementation is faster
 def has_hyphen(word):
-    return bool(search('-', word))
+    for char in word:
+        if char == '-':
+            return True
+    # return any(char == '_' for char in word)
+    # return bool(search('-', word))
 
 
 # TODO change this to receive a master feature index
@@ -83,6 +93,44 @@ def represent_history_with_features(feature_ids, history, ctag):
         features.append(feature_ids.f110_index_dict[(CONTAINS_HYPHEN, ctag)])
 
     return features
+
+# This function does the same thing as the function above, only it returns a numpy array
+def nd_history_feature_representation(feature_ids, history, ctag):
+    pword, cword, nword = history[4].lower(), history[0].lower(), history[3].lower()
+    pptag, ptag = history[1], history[2]
+    has_upper = not history[0].islower()
+    features_index = np.zeros(feature_ids.total_features)
+
+    if (cword, ctag) in feature_ids.f100_index_dict:
+        features_index[feature_ids.f100_index_dict[(cword, ctag)]] = 1
+
+    for n in range(1, 5):
+        if len(cword) <= n:
+            break
+        if (cword[:n], ctag) in feature_ids.f101_index_dict:
+            features_index[feature_ids.f101_index_dict[(cword[:n], ctag)]] = 1
+        if (cword[-n:], ctag) in feature_ids.f102_index_dict:
+            features_index[feature_ids.f102_index_dict[(cword[-n:], ctag)]] = 1
+
+    if (pptag, ptag, ctag) in feature_ids.f103_index_dict:
+        features_index[feature_ids.f103_index_dict[(pptag, ptag, ctag)]] = 1
+
+    if (ptag, ctag) in feature_ids.f104_index_dict:
+        features_index[feature_ids.f104_index_dict[(ptag, ctag)]] = 1
+
+    if ctag in feature_ids.f105_index_dict:
+        features_index[feature_ids.f105_index_dict[ctag]] = 1
+
+    if has_digit(cword) and (CONTAINS_DIGIT, ctag) in feature_ids.f108_index_dict:
+        features_index[feature_ids.f108_index_dict[(CONTAINS_DIGIT, ctag)]] = 1
+
+    if has_upper and (CONTAINS_UPPER, ctag) in feature_ids.f109_index_dict:
+        features_index[feature_ids.f109_index_dict[(CONTAINS_UPPER, ctag)]] = 1
+
+    if has_hyphen(cword) and (CONTAINS_HYPHEN, ctag) in feature_ids.f110_index_dict:
+        features_index[feature_ids.f110_index_dict[(CONTAINS_HYPHEN, ctag)]] = 1
+
+    return features_index
 
 
 def calc_features_list(feature_ids, histories_list, ctags_list):

@@ -16,7 +16,8 @@ def calc_q(feature_ids, weights, all_tags, pword, cword, nword, pptag, ptag, cta
     return numerator / denominator
 
 
-def memm_viterbi(feature_ids, weights, all_tags, sentence):
+# TODO implement beam-search
+def memm_viterbi(feature_ids, weights, all_tags, sentence, beam_size=None):
     words_arr = [BEGIN] + get_words_arr(sentence) + [STOP]
     # Offsetting the size of the list to match the mathematical algorithm
     n = len(words_arr) - 2
