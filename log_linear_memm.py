@@ -62,10 +62,11 @@ class Log_Linear_MEMM:
         self.preprocess(threshold)
         self.optimize(lam)
 
-    def predict(self, input_data, predictions_path='predictions/predictions.wtag'):
+    def predict(self, input_data, predictions_path='predictions/predictions.wtag', beam_size=5):
         """
         Generates a prediction for a given input. Input can be either a sentence (string) or a file path.
         File has to be in *.wtag format.
+        :param beam_size:
         :param predictions_path: Saves predictions to path if input was a file
         :param input_data: string or file path
         """
@@ -74,9 +75,10 @@ class Log_Linear_MEMM:
                 with open(input_data[:-4] + '_predictions.txt', 'w') as out_file:
                     for line in in_file:
                         words = line.split()
-                        predictions = memm_viterbi(self.feature2id, self.weights, self.feature2id.get_all_tags(), line)
+                        predictions = memm_viterbi(self.feature2id, self.weights, self.feature2id.get_all_tags(),
+                                                   line, beam_size)
                         for word, pred in zip(words, predictions):
                             out_file.write(word + '_' + pred + ' ')
 
         else:
-            return memm_viterbi(self.feature2id, self.weights, self.feature2id.get_all_tags(), input_data)
+            return memm_viterbi(self.feature2id, self.weights, self.feature2id.get_all_tags(), input_data, beam_size)

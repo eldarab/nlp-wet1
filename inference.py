@@ -17,14 +17,13 @@ def calc_q(feature_ids, weights, all_tags, pword, cword, nword, pptag, ptag, cta
 
 
 # TODO implement beam-search
-def memm_viterbi(feature_ids, weights, all_tags, sentence, beam_size=None):
+def memm_viterbi(feature_ids, weights, all_tags, sentence, beam_size):
     words_arr = [BEGIN] + get_words_arr(sentence) + [STOP]
     # Offsetting the size of the list to match the mathematical algorithm
     n = len(words_arr) - 2
 
     pi = [{} for i in range(n + 1)]
     bp = [{} for i in range(n + 1)]
-    # TODO make this useful or delete it
     pi[0][(BEGIN, BEGIN)] = 1
 
     tags_dict = {-1: [BEGIN], 0: [BEGIN], n+1: [STOP]}
@@ -37,7 +36,9 @@ def memm_viterbi(feature_ids, weights, all_tags, sentence, beam_size=None):
         cword = nword
         nword = words_arr[k + 1]
 
+        beam_list = []
         for v in tags_dict[k]:
+            v_prob = 0
             for u in tags_dict[k-1]:
                 pi[k][u, v] = 0
                 for t in tags_dict[k-2]:
@@ -48,6 +49,12 @@ def memm_viterbi(feature_ids, weights, all_tags, sentence, beam_size=None):
                     if pi[k-1][t, u] * q > pi[k][u, v]:
                         pi[k][u, v] = pi[k-1][t, u] * q
                         bp[k][u, v] = t
+                v_prob += pi[k][u, v]
+            beam_list.append(v_prob)
+
+        if beam_size is not None:
+            tags_dict[k] = sorted(beam_list, reverse=True)[:beam_size]
+
 
     # for k in tqdm(range(1, n + 1)):
     #     pword = cword

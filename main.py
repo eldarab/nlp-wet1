@@ -35,7 +35,8 @@ if __name__ == '__main__':
     model.load_weights('dumps/weights_2020-04-30_12-47-31.pkl')
 
     #   Predict
-    prediction = model.predict('data/debugging_dataset_201_210_clean.txt')
+    # prediction = model.predict('data/debugging_dataset_201_210_clean.txt')
+    prediction = model.predict('Michael , which also processes potatoes , still relies on spuds for about a fourth of its sales and nearly half its pretax profit . ')
     prediction_time = strftime("%Y-%m-%d_%H-%M-%S")
 
     #  End message
