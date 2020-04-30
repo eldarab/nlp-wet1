@@ -1,5 +1,5 @@
 from log_linear_memm import Log_Linear_MEMM
-from time import strftime
+from time import strftime, time
 from emailer import send_email
 
 
