@@ -18,25 +18,26 @@ def clean_predictions(input_data):
 if __name__ == '__main__':
     # clean_predictions('data/debugging_dataset_201_210.wtag')
     start_time = strftime("%Y-%m-%d_%H-%M-%S")
-    train_data = 'data/debugging_dataset_200.wtag'
+    train_data = 'data/train1.wtag'
     model = Log_Linear_MEMM()
     model.set_train_path(train_data)
 
     #   Preprocessing
-    model.preprocess(threshold=10, f100=True, f101=False, f102=False, f103=True,
-                     f104=True, f105=True, f108=False, f109=False, f110=False)
+    # model.preprocess(threshold=10, f100=True, f101=False, f102=False, f103=True,
+    #                  f104=True, f105=True, f108=False, f109=False, f110=False)
+    model.preprocess(threshold=10, f100=True, f101=True, f102=True, f103=True,
+                     f104=True, f105=True, f108=True, f109=True, f110=True)
     preprocess_time = strftime("%Y-%m-%d_%H-%M-%S")
 
     #   Optimizing
-    # model.optimize(lam=1, maxiter=25, weights_path='dumps/weights_' + start_time + '.pkl')
+    model.optimize(lam=10, maxiter=100, weights_path='dumps/weights_' + start_time + '.pkl')
     optimization_time = strftime("%Y-%m-%d_%H-%M-%S")
 
     #   Load pre-trained weights
-    model.load_weights('dumps/weights_2020-04-30_12-47-31.pkl')
+    # model.load_weights('dumps/weights_2020-04-30_14-31-45.pkl')
 
     #   Predict
     # prediction = model.predict('data/debugging_dataset_201_210_clean.txt')
-    prediction = model.predict('Michael , which also processes potatoes , still relies on spuds for about a fourth of its sales and nearly half its pretax profit . ')
     prediction_time = strftime("%Y-%m-%d_%H-%M-%S")
 
     #  End message

@@ -27,7 +27,8 @@ def memm_viterbi(feature_ids, weights, all_tags, sentence, beam_size):
     pi[0][(BEGIN, BEGIN)] = 1
 
     tags_dict = {-1: [BEGIN], 0: [BEGIN], n+1: [STOP]}
-    tags_dict.update(dict.fromkeys([i for i in range(1, n+1)], all_tags))
+    if beam_size == 0:
+        tags_dict.update(dict.fromkeys([i for i in range(1, n+1)], all_tags))
 
     cword, nword = words_arr[0], words_arr[1]
 
@@ -37,7 +38,7 @@ def memm_viterbi(feature_ids, weights, all_tags, sentence, beam_size):
         nword = words_arr[k + 1]
 
         beam_list = []
-        for v in tags_dict[k]:
+        for v in all_tags:
             v_prob = 0
             for u in tags_dict[k-1]:
                 pi[k][u, v] = 0
@@ -50,10 +51,10 @@ def memm_viterbi(feature_ids, weights, all_tags, sentence, beam_size):
                         pi[k][u, v] = pi[k-1][t, u] * q
                         bp[k][u, v] = t
                 v_prob += pi[k][u, v]
-            beam_list.append(v_prob)
-
-        if beam_size is not None:
-            tags_dict[k] = sorted(beam_list, reverse=True)[:beam_size]
+            beam_list.append((v, v_prob))
+        beam_list.sort(reverse=True, key=lambda item: item[1])
+        if beam_size != 0:
+            tags_dict[k] = [beam_list[i][0] for i in range(beam_size)]
 
 
     # for k in tqdm(range(1, n + 1)):
