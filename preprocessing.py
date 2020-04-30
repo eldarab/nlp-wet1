@@ -2,7 +2,7 @@ from collections import OrderedDict
 from metodot_ezer import *
 
 
-class feature_statistics_class:
+class FeatureStatisticsClass:
     def __init__(self, file_path):
         self.file_path = file_path
         self.f100_count_dict = OrderedDict()  # Init all features dictionaries
@@ -11,13 +11,15 @@ class feature_statistics_class:
         self.f103_count_dict = OrderedDict()  # Trigram features
         self.f104_count_dict = OrderedDict()  # Bigram features
         self.f105_count_dict = OrderedDict()  # Unigram features
+        self.f106_count_dict = OrderedDict()  # Previous word + tag
+        self.f107_count_dict = OrderedDict()  # Next word + tag
         # Remember to add new features to count_features, initialize_index_dict, and preprocess (in log_linear_memm)
         self.f108_count_dict = OrderedDict()  # Contain Number features
         self.f109_count_dict = OrderedDict()  # Contain Uppercase features
         self.f110_count_dict = OrderedDict()  # Contain Hyphen features
 
-    def count_features(self, f100=True, f101=True, f102=True, f103=True, f104=True, f105=True, f108=True,
-                       f109=True, f110=True):
+    def count_features(self, f100=True, f101=True, f102=True, f103=True, f104=True, f105=True, f106=True, f107=True,
+                       f108=True, f109=True, f110=True):
         if f100:
             self.count_f100()
         if f101:
@@ -97,6 +99,30 @@ class feature_statistics_class:
                     ctag = word_tag.split('_')[1]
                     add_or_append(self.f105_count_dict, ctag)
 
+    def count_f106(self, skip_end=False):
+        with open(self.file_path) as f:
+            for line in f:
+                words_tags_arr = get_words_arr(line)
+                n = len(words_tags_arr)
+                for i in range(n):
+                    if skip_end and i == n-1:
+                        continue
+                    pword = words_tags_arr[i].split('_')[0]
+                    ctag = words_tags_arr[i+1].split('_')[1] if i < n-1 else STOP
+                    add_or_append(self.f106_count_dict, (pword, ctag))
+                    
+    def count_f107(self, skip_start=True):
+        with open(self.file_path) as f:
+            for line in f:
+                words_tags_arr = get_words_arr(line)
+                n = len(words_tags_arr)
+                for i in range(n):
+                    if skip_start and i == 0:
+                        continue
+                    nword = words_tags_arr[i].split('_')[0]
+                    ctag = words_tags_arr[i-1].split('_')[1] if i > 0 else BEGIN
+                    add_or_append(self.f107_count_dict, (nword, ctag))
+
     def count_f108(self):
         with open(self.file_path) as f:
             for line in f:
@@ -125,7 +151,7 @@ class feature_statistics_class:
                         add_or_append(self.f110_count_dict, (CONTAINS_HYPHEN, ctag))
 
 
-class feature2id_class:
+class Feature2Id:
     def __init__(self, file_path, feature_statistics, threshold):
         self.file_path = file_path
         self.feature_statistics = feature_statistics  # statistics class, for each feature gives empirical counts
@@ -138,6 +164,8 @@ class feature2id_class:
         self.f103_counter = 0
         self.f104_counter = 0
         self.f105_counter = 0
+        self.f106_counter = 0
+        self.f107_counter = 0
         self.f108_counter = 0
         self.f109_counter = 0
         self.f110_counter = 0
@@ -148,12 +176,14 @@ class feature2id_class:
         self.f103_index_dict = OrderedDict()
         self.f104_index_dict = OrderedDict()
         self.f105_index_dict = OrderedDict()
+        self.f106_index_dict = OrderedDict()
+        self.f107_index_dict = OrderedDict()
         self.f108_index_dict = OrderedDict()
         self.f109_index_dict = OrderedDict()
         self.f110_index_dict = OrderedDict()
 
-    def initialize_index_dicts(self, f100=True, f101=True, f102=True, f103=True, f104=True, f105=True, f108=True,
-                               f109=True, f110=True):
+    def initialize_index_dicts(self, f100=True, f101=True, f102=True, f103=True, f104=True, f105=True, f106=True,
+                               f107=True, f108=True, f109=True, f110=True):
         """
         Initializes index dictionaries for features given in the list.
         :param f100: True if f100 should be initialized
@@ -178,6 +208,10 @@ class feature2id_class:
             self.initialize_f104_index_dict()
         if f105:
             self.initialize_f105_index_dict()
+        if f106:
+            self.initialize_f106_index_dict()
+        if f107:
+            self.initialize_f107_index_dict()
         if f108:
             self.initialize_f108_index_dict()
         if f109:
@@ -292,7 +326,39 @@ class feature2id_class:
                         self.f105_index_dict[ctag] = self.f105_counter + self.total_features
                         self.f105_counter += 1
         self.total_features += self.f105_counter
-
+    
+    def initialize_f106_index_dict(self, skip_end=False):
+        with open(self.file_path) as f:
+            for line in f:
+                words_tags_arr = get_words_arr(line)
+                n = len(words_tags_arr)
+                for i in range(n):
+                    if skip_end and i == n-1:
+                        continue
+                    pword = words_tags_arr[i].split('_')[0]
+                    ctag = words_tags_arr[i+1].split('_')[1] if i < n-1 else STOP
+                    if (pword, ctag) not in self.f106_index_dict \
+                            and self.feature_statistics.f106_count_dict[(pword, ctag)] >= self.threshold:
+                        self.f106_index_dict[(pword, ctag)] = self.f106_counter + self.total_features
+                        self.f106_counter += 1
+        self.total_features += self.f106_counter
+    
+    def initialize_f107_index_dict(self, skip_start=False):
+        with open(self.file_path) as f:
+            for line in f:
+                words_tags_arr = get_words_arr(line)
+                n = len(words_tags_arr)
+                for i in range(n):
+                    if skip_start and i == 0:
+                        continue
+                    nword = words_tags_arr[i].split('_')[0]
+                    ctag = words_tags_arr[i-1].split('_')[1] if i > 0 else STOP
+                    if (nword, ctag) not in self.f107_index_dict \
+                            and self.feature_statistics.f107_count_dict[(nword, ctag)] >= self.threshold:
+                        self.f107_index_dict[(nword, ctag)] = self.f107_counter + self.total_features
+                        self.f107_counter += 1
+        self.total_features += self.f107_counter
+    
     def initialize_f108_index_dict(self):
         with open(self.file_path) as f:
             for line in f:
@@ -332,3 +398,48 @@ class feature2id_class:
                             self.f110_index_dict[(CONTAINS_HYPHEN, ctag)] = self.f110_counter + self.total_features
                             self.f110_counter += 1
         self.total_features += self.f110_counter
+
+    # TODO consider changing this to receive a master feature index
+    def history_feature_representation(self, history, ctag):
+        pword, cword, nword = history[4].lower(), history[0].lower(), history[3].lower()
+        pptag, ptag = history[1], history[2]
+        features = []
+        has_upper = not history[0].islower()
+
+        if (cword, ctag) in self.f100_index_dict:
+            features.append(self.f100_index_dict[(cword, ctag)])
+
+        for n in range(1, 5):
+            if len(cword) <= n:
+                break
+            if (cword[:n], ctag) in self.f101_index_dict:
+                features.append(self.f101_index_dict[(cword[:n], ctag)])
+            if (cword[-n:], ctag) in self.f102_index_dict:
+                features.append(self.f102_index_dict[(cword[-n:], ctag)])
+
+        if (pptag, ptag, ctag) in self.f103_index_dict:
+            features.append(self.f103_index_dict[(pptag, ptag, ctag)])
+
+        if (ptag, ctag) in self.f104_index_dict:
+            features.append(self.f104_index_dict[(ptag, ctag)])
+
+        if ctag in self.f105_index_dict:
+            features.append(self.f105_index_dict[ctag])
+
+        if (pword, ctag) in self.f106_index_dict:
+            features.append(self.f106_index_dict[(pword, ctag)])
+
+        if (nword, ctag) in self.f107_index_dict:
+            features.append(self.f107_index_dict[(nword, ctag)])
+
+        if has_digit(cword) and (CONTAINS_DIGIT, ctag) in self.f108_index_dict:
+            features.append(self.f108_index_dict[(CONTAINS_DIGIT, ctag)])
+
+        if has_upper and (CONTAINS_UPPER, ctag) in self.f109_index_dict:
+            features.append(self.f109_index_dict[(CONTAINS_UPPER, ctag)])
+
+        if has_hyphen(cword) and (CONTAINS_HYPHEN, ctag) in self.f110_index_dict:
+            features.append(self.f110_index_dict[(CONTAINS_HYPHEN, ctag)])
+
+        return np.array(features)
+

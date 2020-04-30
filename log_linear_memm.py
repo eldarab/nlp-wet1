@@ -27,9 +27,9 @@ class Log_Linear_MEMM:
 
     def preprocess(self, threshold=10, f100=True, f101=True, f102=True, f103=True, f104=True, f105=True, f108=True,
                    f109=True, f110=True):
-        self.feature_statistics = feature_statistics_class(self.train_path)
+        self.feature_statistics = FeatureStatisticsClass(self.train_path)
         self.feature_statistics.count_features(f100, f101, f102, f103, f104, f105, f108, f109, f110)
-        self.feature2id = feature2id_class(self.train_path, self.feature_statistics, threshold)
+        self.feature2id = Feature2Id(self.train_path, self.feature_statistics, threshold)
         self.feature2id.initialize_index_dicts(f100, f101, f102, f103, f104, f105, f108, f109, f110)
         self.dim = self.feature2id.total_features
 

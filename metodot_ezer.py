@@ -74,6 +74,7 @@ def has_hyphen(word):
     # return bool(search('-', word))
 
 
+"""
 # TODO consider changing this to receive a master feature index
 # def represent_history_with_features(feature_ids, sentence, i, pptag, ptag, ctag):
 def represent_history_with_features(feature_ids, history, ctag):
@@ -112,6 +113,7 @@ def represent_history_with_features(feature_ids, history, ctag):
         features.append(feature_ids.f110_index_dict[(CONTAINS_HYPHEN, ctag)])
 
     return np.array(features)
+"""
 
 
 # This function does the same thing as the function above, only it returns a dense numpy array
@@ -154,14 +156,16 @@ def nd_history_feature_representation(feature_ids, history, ctag):
 
 
 def calc_features_list(feature_ids, histories_list, ctags_list):
-    return [represent_history_with_features(feature_ids, histories_list[i], ctags_list[i])
+    # return [represent_history_with_features(feature_ids, histories_list[i], ctags_list[i])
+    #         for i in range(len(histories_list))]
+    return [feature_ids.history_feature_representation(histories_list[i], ctags_list[i])
             for i in range(len(histories_list))]
 
 
 def build_features_mat(feature_ids, all_histories_list, all_tags_list):
     row_dim = len(all_histories_list)
     col_dim = len(all_tags_list)
-    feature_mat = [[represent_history_with_features(feature_ids, all_histories_list[i], all_tags_list[j])
+    feature_mat = [[feature_ids.history_feature_representation(all_histories_list[i], all_tags_list[j])
                     for j in range(col_dim)] for i in range(row_dim)]
     return feature_mat
 

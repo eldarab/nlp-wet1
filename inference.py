@@ -6,11 +6,13 @@ from tqdm import tqdm
 
 def calc_q(feature_ids, weights, all_tags, pword, cword, nword, pptag, ptag, ctag):
     history = (cword, pptag, ptag, pword, nword)
-    feature_rep = represent_history_with_features(feature_ids, history, ctag)
+    # feature_rep = represent_history_with_features(feature_ids, history, ctag)
+    feature_rep = feature_ids.history_feature_representation(history, ctag)
     numerator = exp(mult_sparse(weights, feature_rep))
     denominator = 0
     for tag in all_tags:
-        feature_rep = represent_history_with_features(feature_ids, history, tag)
+        # feature_rep = represent_history_with_features(feature_ids, history, tag)
+        feature_rep = feature_ids.history_feature_representation(history, tag)
         denominator += exp(mult_sparse(weights, feature_rep))
 
     return numerator / denominator
@@ -26,7 +28,7 @@ def memm_viterbi(feature_ids, weights, all_tags, sentence, beam_size):
     bp = [{} for i in range(n + 1)]
     pi[0][(BEGIN, BEGIN)] = 1
 
-    tags_dict = {-1: [BEGIN], 0: [BEGIN], n+1: [STOP]}
+    tags_dict = {-1: [BEGIN], 0: [BEGIN]}
     if beam_size == 0:
         tags_dict.update(dict.fromkeys([i for i in range(1, n+1)], all_tags))
 
@@ -55,7 +57,6 @@ def memm_viterbi(feature_ids, weights, all_tags, sentence, beam_size):
         beam_list.sort(reverse=True, key=lambda item: item[1])
         if beam_size != 0:
             tags_dict[k] = [beam_list[i][0] for i in range(beam_size)]
-
 
     # for k in tqdm(range(1, n + 1)):
     #     pword = cword
