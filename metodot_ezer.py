@@ -92,9 +92,10 @@ def represent_history_with_features(feature_ids, history, ctag):
     if has_hyphen(cword) and (CONTAINS_HYPHEN, ctag) in feature_ids.f110_index_dict:
         features.append(feature_ids.f110_index_dict[(CONTAINS_HYPHEN, ctag)])
 
-    return features
+    return np.array(features)
 
-# This function does the same thing as the function above, only it returns a numpy array
+
+# This function does the same thing as the function above, only it returns a dense numpy array
 def nd_history_feature_representation(feature_ids, history, ctag):
     pword, cword, nword = history[4].lower(), history[0].lower(), history[3].lower()
     pptag, ptag = history[1], history[2]
@@ -187,11 +188,13 @@ def get_all_histories_ctags(file_path):
     return all_histories, all_ctags
 
 
+"""
 def get_all_features_list(feature_ids, all_histories_list, all_ctags_list):
     all_features_list = []
     for history, ctag in all_histories_list, all_ctags_list:
         all_features_list.append(represent_history_with_features(feature_ids, history, ctag))
     return all_features_list
+"""
 
 
 def get_all_tags(file_path):

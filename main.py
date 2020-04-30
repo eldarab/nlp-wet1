@@ -21,14 +21,24 @@ if __name__ == '__main__':
     train_data = 'data/debugging_dataset_200.wtag'
     model = Log_Linear_MEMM()
     model.set_train_path(train_data)
+
+    #   Preprocessing
     model.preprocess(threshold=10, f100=True, f101=False, f102=False, f103=True,
                      f104=True, f105=True, f108=False, f109=False, f110=False)
     preprocess_time = strftime("%Y-%m-%d_%H-%M-%S")
+
+    #   Optimizing
     # model.optimize(lam=1, maxiter=25, weights_path='dumps/weights_' + start_time + '.pkl')
     optimization_time = strftime("%Y-%m-%d_%H-%M-%S")
-    model.load_weights('dumps/weights_2020-04-27_15-19-14.pkl')
+
+    #   Load pre-trained weights
+    model.load_weights('dumps/weights_2020-04-30_12-47-31.pkl')
+
+    #   Predict
     prediction = model.predict('data/debugging_dataset_201_210_clean.txt')
     prediction_time = strftime("%Y-%m-%d_%H-%M-%S")
+
+    #  End message
     message_body = 'Start: ' + start_time + '\nPreprocess end: ' + preprocess_time + '\nOptimization end: ' + \
                    optimization_time + '\nPrediction end: ' + prediction_time
 
