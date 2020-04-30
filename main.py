@@ -1,5 +1,5 @@
 from log_linear_memm import Log_Linear_MEMM
-from time import strftime
+from time import strftime, time
 from emailer import send_email
 
 
@@ -23,8 +23,8 @@ if __name__ == '__main__':
     model.set_train_path(train_data)
 
     #   Preprocessing
-    model.preprocess(threshold=10, f100=True, f101=False, f102=False, f103=True,
-                     f104=True, f105=True, f108=False, f109=False, f110=False)
+    model.preprocess(threshold=10, f100=True, f101=True, f102=True, f103=True,
+                     f104=True, f105=True, f108=True, f109=True, f110=True)
     preprocess_time = strftime("%Y-%m-%d_%H-%M-%S")
 
     #   Optimizing
