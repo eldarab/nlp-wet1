@@ -32,7 +32,7 @@ def get_words_arr(line):
     words_tags_arr = line.split(' ')
     if len(words_tags_arr) == 0:
         raise Exception("get_words_arr got an empty sentence.")
-    if words_tags_arr[-1][-2:] == '\n':
+    if words_tags_arr[-1][-1:] == '\n':
         words_tags_arr[-1] = words_tags_arr[-1][:-1]  # removing \n from end of line
     return words_tags_arr
 
@@ -41,6 +41,8 @@ def get_line_tags(line):
     words_tags_arr = get_words_arr(line)
     tags = []
     for word_tag in words_tags_arr:
+        if word_tag == '':
+            continue
         tag = word_tag.split('_')[1]
         tags.append(tag)
     return tags

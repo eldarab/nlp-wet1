@@ -1,5 +1,6 @@
 from log_linear_memm import Log_Linear_MEMM
 from time import strftime, time
+from evaluation import *
 from emailer import send_email
 
 
@@ -18,7 +19,7 @@ def clean_predictions(input_data):
 if __name__ == '__main__':
     # clean_predictions('data/debugging_dataset_201_210.wtag')
     start_time = strftime("%Y-%m-%d_%H-%M-%S")
-    train_data = 'data/train1.wtag'
+    train_data = 'data/debugging_dataset_200.wtag'
     model = Log_Linear_MEMM()
     model.set_train_path(train_data)
 
@@ -29,20 +30,25 @@ if __name__ == '__main__':
                      f104=True, f105=True, f108=True, f109=True, f110=True)
     preprocess_time = strftime("%Y-%m-%d_%H-%M-%S")
 
-    #   Optimizing
-    model.optimize(lam=10, maxiter=100, weights_path='dumps/weights_' + start_time + '.pkl')
-    optimization_time = strftime("%Y-%m-%d_%H-%M-%S")
-
+    # #   Optimizing
+    # model.optimize(lam=1, maxiter=10, weights_path='dumps/weights_' + start_time + '.pkl')
+    # optimization_time = strftime("%Y-%m-%d_%H-%M-%S")
+    #
     #   Load pre-trained weights
-    # model.load_weights('dumps/weights_2020-04-30_14-31-45.pkl')
+    model.load_weights('dumps/weights_2020-04-30_15-17-13.pkl')
 
     #   Predict
-    # prediction = model.predict('data/debugging_dataset_201_210_clean.txt')
+    # TODO evaluate with different beam sizes
+    prediction = model.predict('data/debugging_dataset_201_210_clean.txt')
     prediction_time = strftime("%Y-%m-%d_%H-%M-%S")
 
     #  End message
-    message_body = 'Start: ' + start_time + '\nPreprocess end: ' + preprocess_time + '\nOptimization end: ' + \
-                   optimization_time + '\nPrediction end: ' + prediction_time
+    # message_body = 'Start: ' + start_time + '\nPreprocess end: ' + preprocess_time + '\nOptimization end: ' + \
+    #                optimization_time + '\nPrediction end: ' + prediction_time
+
+    #  Evaluate
+    print(accuracy('data/debugging_dataset_201_210.wtag', 'data/debugging_dataset_201_210_clean_predictions.txt'))
+    print(cm('data/debugging_dataset_201_210.wtag', 'data/debugging_dataset_201_210_clean_predictions.txt'))
 
     # send_email('eldar.abraham@gmail.com', '<my penis>', ['eldar.a@campus.technion.ac.il'], message_body)
     # model.load_weights('dumps/weights.pkl')
