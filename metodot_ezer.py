@@ -37,6 +37,23 @@ def get_words_arr(line):
     return words_tags_arr
 
 
+def get_line_tags(line):
+    words_tags_arr = get_words_arr(line)
+    tags = []
+    for word_tag in words_tags_arr:
+        tag = word_tag.split('_')[1]
+        tags.append(tag)
+    return tags
+
+
+def get_all_labels(file):
+    with open(file, 'r') as file:
+        labels = []
+        for line in file:
+            labels = labels + get_line_tags(line)
+    return labels
+
+
 # TODO check which implementation is faster
 def has_digit(word):
     for char in word:

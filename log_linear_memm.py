@@ -70,6 +70,7 @@ class Log_Linear_MEMM:
         :param predictions_path: Saves predictions to path if input was a file
         :param input_data: string or file path
         """
+        # TODO add functionality from '.words' files as well
         if len(input_data) > 4 and input_data[-4:] == '.txt':
             with open(input_data, 'r') as in_file:
                 with open(input_data[:-4] + '_predictions.txt', 'w') as out_file:
