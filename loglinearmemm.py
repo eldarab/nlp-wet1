@@ -7,16 +7,16 @@ import pickle
 import numpy as np
 from inference import memm_viterbi
 from time import strftime
-from os import SEEK_END, remove
+from os import remove
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 sns.set()
 
 
-class Log_Linear_MEMM:
-    def __init__(self, threshold=10, fix_threshold=50, lam=0, maxiter=100, f100=True, f101=True, f102=True, f103=True, f104=True,
-                 f105=True, f106=True, f107=True, f108=True, f109=True, f110=True):
+class LogLinearMEMM:
+    def __init__(self, threshold=10, fix_threshold=50, lam=0, maxiter=100, f100=True, f101=True, f102=True, f103=True,
+                 f104=True, f105=True, f106=True, f107=True, f108=True, f109=True, f110=True):
         self.train_path = None
         self.feature_statistics = None
         self.feature2id = None
@@ -205,3 +205,9 @@ class Log_Linear_MEMM:
             ax = sns.heatmap(cm, annot=True, cmap='Blues')
             plt.show()
         return cm
+
+    @staticmethod
+    def create_predictions_file(predictions, file_name=r'predictions/prediction_'+strftime("%Y-%m-%d_%H-%M-%S")+'.txt'):
+        with open(file=file_name, mode='w') as predictions_file:
+            predictions_file.write('\n'.join(' '.join([word+'_'+tag for word, tag in sentence_prediction])
+                                             for sentence_prediction in predictions))

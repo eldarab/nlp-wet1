@@ -1,11 +1,11 @@
-from log_linear_memm import Log_Linear_MEMM
+from loglinearmemm import LogLinearMEMM
 from time import strftime, time
 
 
 if __name__ == '__main__':
     start_time = strftime("%Y-%m-%d_%H-%M-%S")
     train_data = 'data/debugging_dataset_200.wtag'
-    model = Log_Linear_MEMM()
+    model = LogLinearMEMM()
     model.set_train_path(train_data)
 
     threshold = 10
