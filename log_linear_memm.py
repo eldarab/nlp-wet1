@@ -6,8 +6,7 @@ from scipy.optimize import fmin_l_bfgs_b
 import pickle
 import numpy as np
 from inference import memm_viterbi
-from os import SEEK_END
-
+from os import SEEK_END, remove
 
 class Log_Linear_MEMM:
     def __init__(self):
@@ -86,30 +85,28 @@ class Log_Linear_MEMM:
         :param beam_size: a parameter of the viterbi
         :param input_data: string or file path
         """
-        # TODO add functionality from '.words' files as well
         # TODO maybe save prediction file as parameter of the model?
         if len(input_data) > 6 and input_data[-6:] == '.words':
-            predictions = []
-            with open(input_data, 'r') as in_file:
-                for line in in_file:
-                    line_predictions = []
-                    words = line.split()
-                    prediction = memm_viterbi(self.feature2id, self.weights, line, beam_size)
-                    for word, pred in zip(words, prediction):
-                        line_predictions.append(word+'_'+pred)
-                    predictions.append(line_predictions)
-            return predictions
+            return self.predict_file(input_data, beam_size)
 
         if len(input_data) > 5 and input_data[-5:] == '.wtag':
-            pass
-            # with open(input_data[:-4] + '_beam-size=' + str(beam_size) + '_predictions.txt', 'w') as out_file:
-            #     for line in in_file:
-            #         words = line.split()
-            #         predictions = memm_viterbi(self.feature2id, self.weights, self.feature2id.get_all_tags(),
-            #                                    line, beam_size)
-            #         for word, pred in zip(words, predictions):
-            #             out_file.write(word + '_' + pred + ' ')
-            #         out_file.write('\b\n')
+            temp_file = r'data\temp.words'
+            clean_tags(input_data, temp_file)
+            predictions = self.predict_file(temp_file, beam_size)
+            remove(temp_file)
+            return predictions
 
         else:
             return memm_viterbi(self.feature2id, self.weights, input_data, beam_size)
+
+    def predict_file(self, file, beam_size):
+        with open(file, 'r') as in_file:
+            predictions = []
+            for line in in_file:
+                line_predictions = []
+                words = line.split()
+                prediction = memm_viterbi(self.feature2id, self.weights, line, beam_size)
+                for word, pred in zip(words, prediction):
+                    line_predictions.append(word + '_' + pred)
+                predictions.append(line_predictions)
+        return predictions

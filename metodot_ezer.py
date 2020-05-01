@@ -199,10 +199,10 @@ def get_all_histories_ctags(file_path):
                 ctag = words_tags_split[i][1]
                 pword = cword
                 cword = words_tags_split[i][0]
-                if i+1 == len(words_tags_split):
+                if i + 1 == len(words_tags_split):
                     nword = STOP
                 else:
-                    nword = words_tags_split[i+1][0]
+                    nword = words_tags_split[i + 1][0]
                 history = (cword, pptag, ptag, pword, nword)
                 all_histories.append(history)
                 all_ctags.append(ctag)
@@ -227,3 +227,17 @@ def get_all_tags(file_path):
                 if tag not in tags:
                     tags.append(tag)
     return tags
+
+
+def clean_tags(input_data, file_name=None):
+    with open(input_data, 'r') as in_file:
+        if file_name is None:
+            file_name = input_data[:-5] + '_clean.words'
+
+        with open(file_name, 'w') as out_file:
+            for line in in_file:
+                words_tags = line.split()
+                for word_tag in words_tags:
+                    word = word_tag.split('_')[0]
+                    out_file.write(word + ' ')
+                out_file.write('\n')
