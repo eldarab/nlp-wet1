@@ -8,14 +8,16 @@ import numpy as np
 from inference import memm_viterbi
 from os import SEEK_END, remove
 
+
 class Log_Linear_MEMM:
-    def __init__(self):
+    def __init__(self, fix_threshold=50):
         self.train_path = None
         self.feature_statistics = None
         self.feature2id = None
         self.weights = None
         self.dim = None
         self.threshold = None
+        self.fix_threshold = fix_threshold
         self.lam = None
         self.maxiter = None
         self.f100 = None
@@ -43,7 +45,7 @@ class Log_Linear_MEMM:
         self.feature_statistics = FeatureStatisticsClass(self.train_path)
         self.feature_statistics.count_features(self.f100, self.f101, self.f102, self.f103, self.f104, self.f105,
                                                self.f106, self.f107, self.f108, self.f109, self.f110)
-        self.feature2id = Feature2Id(self.train_path, self.feature_statistics, self.threshold)
+        self.feature2id = Feature2Id(self.train_path, self.feature_statistics, self.threshold, self.fix_threshold)
         self.feature2id.initialize_index_dicts(self.f100, self.f101, self.f102, self.f103, self.f104, self.f105,
                                                self.f106, self.f107, self.f108, self.f109, self.f110)
         self.dim = self.feature2id.total_features

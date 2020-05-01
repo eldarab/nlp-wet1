@@ -13,13 +13,12 @@ class FeatureStatisticsClass:
         self.f105_count_dict = OrderedDict()  # Unigram features
         self.f106_count_dict = OrderedDict()  # Previous word + tag
         self.f107_count_dict = OrderedDict()  # Next word + tag
-        # Remember to add new features to count_features, initialize_index_dict, and preprocess (in log_linear_memm)
+        # TODO add new features to count_features, initialize_index_dict, and preprocess (in log_linear_memm)
         self.f108_count_dict = OrderedDict()  # Contain Number features
         self.f109_count_dict = OrderedDict()  # Contain Uppercase features
         self.f110_count_dict = OrderedDict()  # Contain Hyphen features
 
-    def count_features(self, f100=True, f101=True, f102=True, f103=True, f104=True, f105=True, f106=True, f107=True,
-                       f108=True, f109=True, f110=True):
+    def count_features(self, f100, f101, f102, f103, f104, f105, f106, f107, f108, f109, f110):
         if f100:
             self.count_f100()
         if f101:
@@ -156,10 +155,11 @@ class FeatureStatisticsClass:
 
 
 class Feature2Id:
-    def __init__(self, file_path, feature_statistics, threshold):
+    def __init__(self, file_path, feature_statistics, threshold, fix_threshold):
         self.file_path = file_path
         self.feature_statistics = feature_statistics  # statistics class, for each feature gives empirical counts
         self.threshold = threshold  # feature count threshold - empirical count must be higher than this
+        self.fix_threshold = fix_threshold  # feature count threshold for prefix and suffix features
         self.total_features = 0  # Total number of features accumulated
         # Internal feature indexing
         self.f100_counter = 0
@@ -186,8 +186,8 @@ class Feature2Id:
         self.f109_index_dict = OrderedDict()
         self.f110_index_dict = OrderedDict()
 
-    def initialize_index_dicts(self, f100=True, f101=True, f102=True, f103=True, f104=True, f105=True, f106=True,
-                               f107=True, f108=True, f109=True, f110=True):
+    def initialize_index_dicts(self, f100, f101, f102, f103, f104, f105, f106,
+                               f107, f108, f109, f110):
         """
         Initializes index dictionaries for features given in the list.
         :param f100: True if f100 should be initialized
@@ -284,7 +284,7 @@ class Feature2Id:
                             break
                         suffix = cword[-n:]
                         if (suffix, ctag) not in self.f102_index_dict \
-                                and self.feature_statistics.f102_count_dict[(suffix, ctag)] >= self.threshold:
+                                and self.feature_statistics.f102_count_dict[(suffix, ctag)] >= self.fix_threshold:
                             self.f102_index_dict[(suffix, ctag)] = self.f102_counter + self.total_features
                             self.f102_counter += 1
         self.total_features += self.f102_counter
@@ -300,7 +300,7 @@ class Feature2Id:
                     ptag = ctag
                     ctag = word_tag.split('_')[1]
                     if (pptag, ptag, ctag) not in self.f103_index_dict \
-                            and self.feature_statistics.f103_count_dict[(pptag, ptag, ctag)] >= self.threshold:
+                            and self.feature_statistics.f103_count_dict[(pptag, ptag, ctag)] >= self.fix_threshold:
                         self.f103_index_dict[(pptag, ptag, ctag)] = self.f103_counter + self.total_features
                         self.f103_counter += 1
         self.total_features += self.f103_counter

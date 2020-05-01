@@ -8,39 +8,25 @@ from sklearn import metrics  # TODO do not lehagish
 def notify_email(start_time, preprocess_time, optimization_time, prediction_time):
     message_body = 'Start: ' + start_time + '\nPreprocess end: ' + preprocess_time + '\nOptimization end: ' + \
                    optimization_time + '\nPrediction end: ' + prediction_time
-    send_email('eldar.abraham@gmail.com', 'Pa$$w0rd2019', ['eldar.a@campus.technion.ac.il'], message_body)
-
-
-# TODO do not lehagish
-def clean_tags(input_data):
-    with open(input_data, 'r') as in_file:
-        with open(input_data[:-5] + '_clean.txt', 'w') as out_file:
-            for line in in_file:
-                words_tags = line.split()
-                for word_tag in words_tags:
-                    word = word_tag.split('_')[0]
-                    out_file.write(word + ' ')
-                out_file.write('\n')
+    send_email('eldar.abraham@gmail.com', '<my penis>', ['eldar.a@campus.technion.ac.il'], message_body)
 
 
 if __name__ == '__main__':
     start_time = strftime("%Y-%m-%d_%H-%M-%S")
     train_data = 'data/train1.wtag'
     model = Log_Linear_MEMM()
-    model.set_train_path(train_data)
 
     #   Preprocessing
     # TODO maybe add all hyper-parameters as instance variables of the model? self.threshold for example
     threshold = 10
-    model.preprocess(threshold=threshold, f101=False, f102=False)
+    model.preprocess(threshold=0)
     preprocess_time = strftime("%Y-%m-%d_%H-%M-%S")
 
     #   Optimizing / loading pre-trained weights
     optimization_time = strftime("%Y-%m-%d_%H-%M-%S")
     lam = 0
-    maxiter = 50
-    model.optimize(lam=lam,
-                   maxiter=maxiter,
+    maxiter = 100
+    model.optimize(lam=lam, maxiter=maxiter,
                    weights_path='dumps/weights_' + train_data[5:-5] + '_threshold=' + str(threshold) + '_lam=' +
                                 str(lam) + '_iter=' + str(maxiter) + '_' + start_time + '.pkl')
     # model.load_weights()
