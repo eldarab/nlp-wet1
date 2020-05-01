@@ -33,7 +33,7 @@ def confusion_matrix(true_file, predictions_file, errors_to_display=10, show=Fal
     # getting tags
     true_tags = get_file_tags(true_file)
     predicted_tags = get_file_tags(predictions_file)
-    all_possible_tags = set(true_tags)
+    all_possible_tags = set(true_tags).union(set(predicted_tags))
 
     # creating "raw" confusion matrix
     n = len(all_possible_tags)
