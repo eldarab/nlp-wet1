@@ -177,19 +177,6 @@ def calc_empirical_counts(features_list, dim):
     return empirical_counts
 
 
-def calc_expected_counts_vec(features_matrix, dim):
-    n = len(features_matrix)
-    expected_counts_mat = np.empty((n, dim))
-    i = 0  # row index, not using zip for efficiency
-    for history in features_matrix:
-        row = np.zeros(dim)
-        for feature in history:
-            row += sparse_to_dense(feature, dim)
-        expected_counts_mat[i] = row
-        i += 1
-    return expected_counts_mat
-
-
 def sparse_to_dense(sparse_vec, dim):
     dense_vec = np.zeros(dim)
     for entrance in sparse_vec:

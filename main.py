@@ -32,7 +32,7 @@ if __name__ == '__main__':
     #   Preprocessing
     # TODO maybe add all hyper-parameters as instance variables of the model? self.threshold for example
     threshold = 10
-    model.preprocess(threshold=threshold)
+    model.preprocess(threshold=threshold, f101=False, f102=False)
     preprocess_time = strftime("%Y-%m-%d_%H-%M-%S")
 
     #   Optimizing / loading pre-trained weights
