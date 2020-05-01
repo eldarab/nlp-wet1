@@ -48,30 +48,30 @@ if __name__ == '__main__':
     predictions_file = 'data/debugging_dataset_201_210_clean_predictions.txt'
     true_tags = get_file_tags(true_file)
     predicted_tags = get_file_tags(predictions_file)
-    confusion_matrix(true_file, predictions_file, show=True, slice_on_pred=False, order='lexi')
-    confusion_matrix(true_file, predictions_file, show=True, slice_on_pred=False, order='freq')
-    confusion_matrix(true_file, predictions_file, show=True, slice_on_pred=True, order='lexi')
-    confusion_matrix(true_file, predictions_file, show=True, slice_on_pred=True, order='freq')
+    # confusion_matrix(true_file, predictions_file, show=True, slice_on_pred=False, order='lexi')
+    # confusion_matrix(true_file, predictions_file, show=True, slice_on_pred=False, order='freq')
+    # confusion_matrix(true_file, predictions_file, show=True, slice_on_pred=True, order='lexi')
+    # confusion_matrix(true_file, predictions_file, show=True, slice_on_pred=True, order='freq')
 
     # TODO Why sklearn are a bunch of idiots? (or Eldar is the idiot, I'd bet the latter)
     accuracy_eldar = accuracy(true_file, predictions_file)
     accuracy_sklearn = metrics.accuracy_score(true_tags, predicted_tags)
-    cm_eldar = raw_confusion_matrix(true_file, predictions_file)
-    cm_sklearn = metrics.confusion_matrix(true_tags, predicted_tags)
-    cm_eldar_sum_row = sorted([int(x) for x in cm_eldar.sum(axis=0)], reverse=True)
-    cm_eldar_sum_col = sorted([int(x) for x in cm_eldar.sum(axis=1)], reverse=True)
-    cm_eldar_sum_all = cm_eldar.sum()
-    cm_sklearn_sum_row = sorted(list(np.array(cm_sklearn).sum(axis=0)), reverse=True)
-    cm_sklearn_sum_col = sorted(list(np.array(cm_sklearn).sum(axis=1)), reverse=True)
-    cm_sklearn_sum_all = cm_sklearn.sum()
     print('Did Eldar implement accuracy correctly? ' + str(accuracy_eldar == accuracy_sklearn))
     print(accuracy_eldar, accuracy_sklearn)
 
     # old testers
-    true_tags_set, predicted_tags_set = set(), set()
-    for tag1, tag2 in zip(true_tags, predicted_tags):
-        if tag1 not in true_tags_set:
-            true_tags_set.add(tag1)
-        if tag2 not in predicted_tags_set:
-            predicted_tags_set.add(tag2)
-    universal_set = true_tags_set.union(predicted_tags_set)
+    # true_tags_set, predicted_tags_set = set(), set()
+    # for tag1, tag2 in zip(true_tags, predicted_tags):
+    #     if tag1 not in true_tags_set:
+    #         true_tags_set.add(tag1)
+    #     if tag2 not in predicted_tags_set:
+    #         predicted_tags_set.add(tag2)
+    # universal_set = true_tags_set.union(predicted_tags_set)
+    # cm_eldar = raw_confusion_matrix(true_file, predictions_file)
+    # cm_sklearn = metrics.confusion_matrix(true_tags, predicted_tags)
+    # cm_eldar_sum_row = sorted([int(x) for x in cm_eldar.sum(axis=0)], reverse=True)
+    # cm_eldar_sum_col = sorted([int(x) for x in cm_eldar.sum(axis=1)], reverse=True)
+    # cm_eldar_sum_all = cm_eldar.sum()
+    # cm_sklearn_sum_row = sorted(list(np.array(cm_sklearn).sum(axis=0)), reverse=True)
+    # cm_sklearn_sum_col = sorted(list(np.array(cm_sklearn).sum(axis=1)), reverse=True)
+    # cm_sklearn_sum_all = cm_sklearn.sum()

@@ -16,7 +16,7 @@ def accuracy(true_file, predictions_file):
     for true, pred in zip(true_tags, predicted_tags):
         if true != pred:
             errors += 1
-    return errors / total_predictions
+    return 1 - errors / total_predictions
 
 
 def confusion_matrix(true_file, predictions_file, errors_to_display=10, show=False, order='freq', slice_on_pred=True):
@@ -77,18 +77,3 @@ def confusion_matrix(true_file, predictions_file, errors_to_display=10, show=Fal
         ax = sns.heatmap(cm, annot=True, cmap='Blues')
         plt.show()
     return cm
-
-
-# TODO delete this after conflict with sklearn CM is solved
-# def raw_confusion_matrix(true_file, predictions_file):
-    # getting tags
-    true_tags = get_file_tags(true_file)
-    predicted_tags = get_file_tags(predictions_file)
-    all_possible_tags = set(true_tags)
-
-    # creating "raw" confusion matrix
-    n = len(all_possible_tags)
-    cm = pd.DataFrame(np.zeros((n, n)), columns=all_possible_tags, index=all_possible_tags)
-    for true, pred in zip(true_tags, predicted_tags):
-        cm.loc[true][pred] += 1
-    return cm.values
