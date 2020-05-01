@@ -17,3 +17,10 @@ def send_email(username, password, to_addresses, body, subject='Your code just f
     server.login(username, password)
     server.sendmail(username, to_addresses, msg)
     server.close()
+
+
+def notify_email(start_time, preprocess_time, optimization_time, prediction_time):
+    # TODO use fake WallaMail account instead to prevent authorization problems of gmail
+    message_body = 'Start: ' + start_time + '\nPreprocess end: ' + preprocess_time + '\nOptimization end: ' + \
+                   optimization_time + '\nPrediction end: ' + prediction_time
+    send_email('eldar.abraham@gmail.com', 'Pa$$w0rd2019', ['eldar.a@campus.technion.ac.il'], message_body)

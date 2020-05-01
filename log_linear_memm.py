@@ -16,6 +16,20 @@ class Log_Linear_MEMM:
         self.feature2id = None
         self.weights = None
         self.dim = None
+        self.threshold = None
+        self.lam = None
+        self.maxiter = None
+        self.f100 = None
+        self.f101 = None
+        self.f102 = None
+        self.f103 = None
+        self.f104 = None
+        self.f105 = None
+        self.f106 = None
+        self.f107 = None
+        self.f108 = None
+        self.f109 = None
+        self.f110 = None
 
     def get_all_tags(self):
         return self.feature2id.get_all_tags()
@@ -25,15 +39,13 @@ class Log_Linear_MEMM:
             optimal_params = pickle.load(f)
         self.weights = optimal_params[0]
 
-    def set_train_path(self, train_path):
-        self.train_path = train_path
-
-    def preprocess(self, threshold=10, f100=True, f101=True, f102=True, f103=True, f104=True, f105=True, f106=True,
-                   f107=True, f108=True, f109=True, f110=True):
+    def preprocess(self):
         self.feature_statistics = FeatureStatisticsClass(self.train_path)
-        self.feature_statistics.count_features(f100, f101, f102, f103, f104, f105, f106, f107, f108, f109, f110)
-        self.feature2id = Feature2Id(self.train_path, self.feature_statistics, threshold)
-        self.feature2id.initialize_index_dicts(f100, f101, f102, f103, f104, f105, f106, f107, f108, f109, f110)
+        self.feature_statistics.count_features(self.f100, self.f101, self.f102, self.f103, self.f104, self.f105,
+                                               self.f106, self.f107, self.f108, self.f109, self.f110)
+        self.feature2id = Feature2Id(self.train_path, self.feature_statistics, self.threshold)
+        self.feature2id.initialize_index_dicts(self.f100, self.f101, self.f102, self.f103, self.f104, self.f105,
+                                               self.f106, self.f107, self.f108, self.f109, self.f110)
         self.dim = self.feature2id.total_features
 
     def optimize(self, lam=0, maxiter=1000, iprint=1, save_weights=True, weights_path='dumps/weights.pkl'):
@@ -62,7 +74,7 @@ class Log_Linear_MEMM:
         :param lam: lambda, regularization constant
         """
         self.train_path = train_path
-        self.preprocess(threshold)
+        self.preprocess()
         self.optimize(lam)
 
     def predict(self, input_data, beam_size=5):
