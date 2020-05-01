@@ -247,3 +247,11 @@ def clean_tags(input_data, file_name=None):
 def load_model(filepath):
     with open(filepath, 'rb') as f:
         return pickle.load(f)
+
+
+def get_predictions_list(predictions):
+    predicted_tags = []
+    for sentence in predictions:
+        for word_tag_tuple in sentence:
+            predicted_tags.append(word_tag_tuple[1])
+    return predicted_tags

@@ -8,6 +8,10 @@ import numpy as np
 from inference import memm_viterbi
 from time import strftime
 from os import SEEK_END, remove
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+sns.set()
 
 
 class Log_Linear_MEMM:
@@ -34,16 +38,6 @@ class Log_Linear_MEMM:
         self.f108 = f108
         self.f109 = f109
         self.f110 = f110
-
-    # TODO check if this function is being used
-    def get_all_tags(self):
-        return self.feature2id.get_all_tags()
-
-    # TODO load model instead of weights
-    def load_weights(self, weights_path='dumps/weights.pkl'):
-        with open(weights_path, 'rb') as f:
-            optimal_params = pickle.load(f)
-        self.weights = optimal_params[0]
 
     def preprocess(self):
         self.feature_statistics = FeatureStatisticsClass(self.train_path)
@@ -101,7 +95,7 @@ class Log_Linear_MEMM:
             f.write('f109 = ' + str(self.f109) + '\n')
             f.write('f110 = ' + str(self.f110) + '\n')
 
-    def predict(self, input_data, beam_size=5):
+    def predict(self, input_data, beam_size):
         """
         Generates a prediction for a given input. Input can be either a sentence (string) or a file path.
         File can be in either .wtag or .words format.
@@ -119,8 +113,7 @@ class Log_Linear_MEMM:
             remove(temp_file)
             return predictions
 
-        else:
-            return memm_viterbi(self.feature2id, self.weights, input_data, beam_size)
+        return memm_viterbi(self.feature2id, self.weights, input_data, beam_size)
 
     # This is a function that is not to be used by anyone other than the function predict
     def __predict_file(self, file, beam_size):
@@ -134,3 +127,80 @@ class Log_Linear_MEMM:
                     line_predictions.append((word, pred))
                 predictions.append(line_predictions)
         return predictions
+
+    @staticmethod
+    def accuracy(test_path, predictions):
+        # getting tags
+        predicted_tags = get_predictions_list(predictions)
+        true_tags = get_file_tags(test_path)
+
+        if len(predicted_tags) != len(true_tags):
+            raise Exception('predicted tags and true tags dont have the same dimension')
+
+        # calculating accuracy
+        total_predictions = len(true_tags)
+        correct = 0
+        for true, pred in zip(true_tags, predicted_tags):
+            if true == pred:
+                correct += 1
+        return correct / total_predictions
+
+    @staticmethod
+    def confusion_matrix(test_path, predictions, errors_to_display=10, show=True, order='freq', slice_on_pred=True):
+        """
+        :param test_path: Path to a *.wtag file with some ground truth
+        :param predictions: Predictions matrix that Log_Linear_MEMM.predict() returned on the same test_path
+        :param errors_to_display: Number of errors to display in CM, as required in the instructions
+        :param show: Whether or not to show the CM at the end
+        :param order: 'freq' for frequent errors left and up, 'lexi' for lexicographic order of tags
+        :param slice_on_pred: The axis to slice errors on (can be either True to slice on true predictions axis or
+                              False to slice on predicted labels axis)
+        :return: DataFrame with the CM values, axes, rows and cols are labeled
+        """
+        # getting tags
+        true_tags = get_file_tags(test_path)
+        predicted_tags = get_predictions_list(predictions)
+        all_possible_tags = set(true_tags).union(set(predicted_tags))
+
+        # creating "raw" confusion matrix
+        n = len(all_possible_tags)
+        cm = pd.DataFrame(np.zeros((n, n)), columns=all_possible_tags, index=all_possible_tags)
+        for true, pred in zip(true_tags, predicted_tags):
+            cm.loc[true][pred] += 1
+
+        # renaming axes names
+        cm = cm.rename_axis('predicted label', axis='columns')
+        cm = cm.rename_axis('true label', axis='rows')
+
+        # if the user requested to slice on true labels axis, than we need to transpose the raw CM
+        # and the logic applies with no change at all. It is set to check a negated if statement because original logic
+        # was designed to make sense for slicing on prediction axis.
+        if not slice_on_pred:
+            cm = cm.transpose()
+
+        # slicing rows/cols of confusion matrix to fit it to the exercise requirements
+        # finding most common error
+        total_tag_predictions = cm.sum(axis=0)
+        correct_tag_predictions = cm.values.diagonal()
+        tag_errors = total_tag_predictions - correct_tag_predictions
+        tag_errors_sorted = tag_errors.sort_values(ascending=False)
+        # slicing matrix
+        top_errors = list(tag_errors_sorted.index.values)[:errors_to_display]
+        cm = cm[top_errors]
+
+        # reordering rows and cols by request
+        if order == 'freq':
+            cm = cm.reindex(top_errors, axis=1)
+            cm = cm.reindex(tag_errors_sorted.index.values, axis=0)
+
+        if order == 'lexi':
+            cm = cm.reindex(sorted(list(cm.columns)), axis=1)
+            cm = cm.reindex(sorted(list(cm.index.values)), axis=0)
+
+        # plotting
+        if show:
+            fig = plt.gcf()
+            fig.set_size_inches(8, 12)
+            ax = sns.heatmap(cm, annot=True, cmap='Blues')
+            plt.show()
+        return cm
