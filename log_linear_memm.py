@@ -110,19 +110,20 @@ class Log_Linear_MEMM:
         """
         # TODO maybe save prediction file as parameter of the model?
         if len(input_data) > 6 and input_data[-6:] == '.words':
-            return self.predict_file(input_data, beam_size)
+            return self.__predict_file(input_data, beam_size)
 
         if len(input_data) > 5 and input_data[-5:] == '.wtag':
             temp_file = r'data\temp.words'
             clean_tags(input_data, temp_file)
-            predictions = self.predict_file(temp_file, beam_size)
+            predictions = self.__predict_file(temp_file, beam_size)
             remove(temp_file)
             return predictions
 
         else:
             return memm_viterbi(self.feature2id, self.weights, input_data, beam_size)
 
-    def predict_file(self, file, beam_size):
+    # This is a function that is not to be used by anyone other than the function predict
+    def __predict_file(self, file, beam_size):
         with open(file, 'r') as in_file:
             predictions = []
             for line in in_file:
