@@ -8,7 +8,7 @@ from sklearn import metrics  # TODO do not lehagish
 def notify_email(start_time, preprocess_time, optimization_time, prediction_time):
     message_body = 'Start: ' + start_time + '\nPreprocess end: ' + preprocess_time + '\nOptimization end: ' + \
                    optimization_time + '\nPrediction end: ' + prediction_time
-    send_email('eldar.abraham@gmail.com', '<my penis>', ['eldar.a@campus.technion.ac.il'], message_body)
+    send_email('eldar.abraham@gmail.com', 'Pa$$w0rd2019', ['eldar.a@campus.technion.ac.il'], message_body)
 
 
 # TODO do not lehagish
@@ -25,7 +25,7 @@ def clean_tags(input_data):
 
 if __name__ == '__main__':
     start_time = strftime("%Y-%m-%d_%H-%M-%S")
-    train_data = 'data/debugging_dataset_200.wtag'
+    train_data = 'data/train1.wtag'
     model = Log_Linear_MEMM()
     model.set_train_path(train_data)
 
@@ -34,30 +34,29 @@ if __name__ == '__main__':
     preprocess_time = strftime("%Y-%m-%d_%H-%M-%S")
 
     #   Optimizing / loading pre-trained weights
-    # optimization_time = strftime("%Y-%m-%d_%H-%M-%S")
-    # model.optimize(lam=1, maxiter=10, weights_path='dumps/weights_' + start_time + '.pkl')
-    model.load_weights('dumps/weights_2020-04-30_15-17-13.pkl')
+    optimization_time = strftime("%Y-%m-%d_%H-%M-%S")
+    lam = 0
+    maxiter = 50
+    model.optimize(lam=lam,
+                   maxiter=maxiter,
+                   weights_path='dumps/weights_' + train_data[5:-5] + '_lam=' + str(lam) + '_iter=' + str(maxiter)
+                                + '_' + start_time + '.pkl')
+    # model.load_weights('dumps/weights_2020-04-30_15-17-13.pkl')
 
     #   Predict
     # TODO evaluate with different beam sizes
     # prediction = model.predict('data/debugging_dataset_201_210_clean.txt')
-    # prediction_time = strftime("%Y-%m-%d_%H-%M-%S")
+    prediction_time = strftime("%Y-%m-%d_%H-%M-%S")
 
     #   Evaluation
-    true_file = 'data/debugging_dataset_201_210.wtag'
-    predictions_file = 'data/debugging_dataset_201_210_clean_predictions.txt'
-    true_tags = get_file_tags(true_file)
-    predicted_tags = get_file_tags(predictions_file)
-    # confusion_matrix(true_file, predictions_file, show=True, slice_on_pred=False, order='lexi')
-    # confusion_matrix(true_file, predictions_file, show=True, slice_on_pred=False, order='freq')
-    # confusion_matrix(true_file, predictions_file, show=True, slice_on_pred=True, order='lexi')
-    # confusion_matrix(true_file, predictions_file, show=True, slice_on_pred=True, order='freq')
+    # true_file = 'data/debugging_dataset_201_210.wtag'
+    # predictions_file = 'data/debugging_dataset_201_210_clean_predictions.txt'
+    # true_tags = get_file_tags(true_file)
+    # predicted_tags = get_file_tags(predictions_file)
+    # confusion_matrix(true_file, predictions_file, show=False, slice_on_pred=False, order='freq')
+    # accuracy = accuracy(true_file, predictions_file)
 
-    # TODO Why sklearn are a bunch of idiots? (or Eldar is the idiot, I'd bet the latter)
-    accuracy_eldar = accuracy(true_file, predictions_file)
-    accuracy_sklearn = metrics.accuracy_score(true_tags, predicted_tags)
-    print('Did Eldar implement accuracy correctly? ' + str(accuracy_eldar == accuracy_sklearn))
-    print(accuracy_eldar, accuracy_sklearn)
+    notify_email(start_time, preprocess_time, optimization_time, prediction_time)
 
     # old testers
     # true_tags_set, predicted_tags_set = set(), set()
