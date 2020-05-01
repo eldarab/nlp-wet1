@@ -74,9 +74,10 @@ class Log_Linear_MEMM:
         :param input_data: string or file path
         """
         # TODO add functionality from '.words' files as well
+        # TODO maybe save prediction file as parameter of the model?
         if len(input_data) > 4 and input_data[-4:] == '.txt':
             with open(input_data, 'r') as in_file:
-                with open(input_data[:-4] + '_predictions.txt', 'w') as out_file:
+                with open(input_data[:-4] + '_beam-size=' + str(beam_size) + '_predictions.txt', 'w') as out_file:
                     for line in in_file:
                         words = line.split()
                         predictions = memm_viterbi(self.feature2id, self.weights, self.feature2id.get_all_tags(),

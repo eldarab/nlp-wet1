@@ -30,7 +30,9 @@ if __name__ == '__main__':
     model.set_train_path(train_data)
 
     #   Preprocessing
-    model.preprocess(threshold=10)
+    # TODO maybe add all hyper-parameters as instance variables of the model? self.threshold for example
+    threshold = 10
+    model.preprocess(threshold=threshold)
     preprocess_time = strftime("%Y-%m-%d_%H-%M-%S")
 
     #   Optimizing / loading pre-trained weights
@@ -39,9 +41,9 @@ if __name__ == '__main__':
     maxiter = 50
     model.optimize(lam=lam,
                    maxiter=maxiter,
-                   weights_path='dumps/weights_' + train_data[5:-5] + '_lam=' + str(lam) + '_iter=' + str(maxiter)
-                                + '_' + start_time + '.pkl')
-    # model.load_weights('dumps/weights_2020-04-30_15-17-13.pkl')
+                   weights_path='dumps/weights_' + train_data[5:-5] + '_threshold=' + str(threshold) + '_lam=' +
+                                str(lam) + '_iter=' + str(maxiter) + '_' + start_time + '.pkl')
+    # model.load_weights()
 
     #   Predict
     # TODO evaluate with different beam sizes
