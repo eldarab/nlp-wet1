@@ -53,8 +53,6 @@ if __name__ == '__main__':
     confusion_matrix(true_file, predictions_file, show=True, slice_on_pred=True, order='lexi')
     confusion_matrix(true_file, predictions_file, show=True, slice_on_pred=True, order='freq')
 
-
-
     # TODO Why sklearn are a bunch of idiots? (or Eldar is the idiot, I'd bet the latter)
     accuracy_eldar = accuracy(true_file, predictions_file)
     accuracy_sklearn = metrics.accuracy_score(true_tags, predicted_tags)

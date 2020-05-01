@@ -53,7 +53,7 @@ def confusion_matrix(true_file, predictions_file, errors_to_display=10, show=Fal
 
     # slicing rows/cols of confusion matrix to fit it to the exercise requirements
     # finding most common error
-    total_tag_predictions = cm.sum(axis=1)
+    total_tag_predictions = cm.sum(axis=0)
     correct_tag_predictions = cm.values.diagonal()
     tag_errors = total_tag_predictions - correct_tag_predictions
     tag_errors_sorted = tag_errors.sort_values(ascending=False)
@@ -73,14 +73,14 @@ def confusion_matrix(true_file, predictions_file, errors_to_display=10, show=Fal
     # plotting
     if show:
         fig = plt.gcf()
-        fig.set_size_inches(10, 8)
+        fig.set_size_inches(8, 12)
         ax = sns.heatmap(cm, annot=True, cmap='Blues')
         plt.show()
     return cm
 
 
 # TODO delete this after conflict with sklearn CM is solved
-def raw_confusion_matrix(true_file, predictions_file):
+# def raw_confusion_matrix(true_file, predictions_file):
     # getting tags
     true_tags = get_file_tags(true_file)
     predicted_tags = get_file_tags(predictions_file)
