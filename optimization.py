@@ -2,6 +2,8 @@ from preprocessing import *
 from math import exp, log
 from numpy.linalg import norm
 
+from concurrent.futures import ThreadPoolExecutor
+
 
 def calc_objective_and_grad_old(v_i, dim, features_list, features_matrix, empirical_counts, reg_lambda):
     """
@@ -108,18 +110,14 @@ def calc_objective_and_grad(v_i, dim, features_list, features_matrix, empirical_
     :param reg_lambda: [[SCALAR]] Hyper-parameter that controls regularization
     :return: A tuple of the likelihood (objective) and it's gradient to pass to fmin_l_bfgs_b
     """
-    # TODO replace mult_sparse with np arrays or sparse arrays and matrix multiplications
 
     #       Objective Function
-
     # calculating linear term
     linear_term = calc_linear_term(v_i, features_list)
 
     # feat_mat is a np array of all of the features from the train data
     # linear_term = np.sum(v_i @ feat_mat)
 
-    # TODO consider implementing using matrix-vector multiplication instead of mult_sparse
-    # features matrix can be either a 3 dimensional array or a list of 2 dimensional arrays
     normalization_term = calc_normalization_term(v_i, features_matrix)
     regularization = calc_regularization(v_i, reg_lambda)  # l2 norm
 
@@ -129,5 +127,25 @@ def calc_objective_and_grad(v_i, dim, features_list, features_matrix, empirical_
 
     likelihood = linear_term - normalization_term - regularization
     grad = empirical_counts - expected_counts - regularization_grad
+
+    return (-1) * likelihood, (-1) * grad
+
+
+def calc_objective_and_grad_with_threading(v_i, dim, features_list, features_matrix, empirical_counts,
+                                           reg_lambda):
+    with ThreadPoolExecutor(max_workers=4) as executor:
+        #       Objective Function
+        # calculating linear term
+        linear_term = executor.submit(calc_linear_term, v_i, features_list).result()
+
+        normalization_term = executor.submit(calc_normalization_term, v_i, features_matrix).result()
+        regularization = executor.submit(calc_regularization, v_i, reg_lambda).result()
+
+        #       Gradient Function
+        expected_counts = executor.submit(calc_expected_counts, v_i, dim, features_matrix).result()
+        regularization_grad = reg_lambda * v_i
+
+        likelihood = linear_term - normalization_term - regularization
+        grad = empirical_counts - expected_counts - regularization_grad
 
     return (-1) * likelihood, (-1) * grad

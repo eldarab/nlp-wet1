@@ -31,6 +31,7 @@ class Log_Linear_MEMM:
         self.f109 = None
         self.f110 = None
 
+    # TODO check if this function is being used
     def get_all_tags(self):
         return self.feature2id.get_all_tags()
 
@@ -48,7 +49,7 @@ class Log_Linear_MEMM:
                                                self.f106, self.f107, self.f108, self.f109, self.f110)
         self.dim = self.feature2id.total_features
 
-    def optimize(self, lam=0, maxiter=1000, iprint=1, save_weights=True, weights_path='dumps/weights.pkl'):
+    def optimize(self, lam=0, maxiter=100, iprint=1, save_weights=True, weights_path='dumps/weights.pkl'):
         # initializing parameters for fmin_l_bfgs_b
         all_tags_list = self.feature2id.get_all_tags()
         all_histories, all_corresponding_tags = get_all_histories_ctags(self.train_path)  # abuse of notation :)
@@ -65,38 +66,50 @@ class Log_Linear_MEMM:
 
         self.weights = optimal_params[0]
 
-    def fit(self, train_path, threshold=10, lam=0):
+    def fit(self, train_path, threshold=10, lam=0, maxiter=100):
         """
         A simple interface to train a model.
         Only allows control on model hyper-parameters, no technical bullshit.
         :param train_path: A path for training data, *.wtag format.
         :param threshold: A threshold for the number of appearances of a parameter in corpus
         :param lam: lambda, regularization constant
+        :param maxiter: the maximum amount of iterations of gradient descent
         """
         self.train_path = train_path
         self.preprocess()
-        self.optimize(lam)
+        self.optimize(lam, maxiter)
 
     def predict(self, input_data, beam_size=5):
         """
         Generates a prediction for a given input. Input can be either a sentence (string) or a file path.
-        File has to be in *.wtag format.
-        :param beam_size:
-        :param predictions_path: Saves predictions to path if input was a file
+        File can be in either .wtag or .words format.
+        :param beam_size: a parameter of the viterbi
         :param input_data: string or file path
         """
         # TODO add functionality from '.words' files as well
         # TODO maybe save prediction file as parameter of the model?
-        if len(input_data) > 4 and input_data[-4:] == '.txt':
+        if len(input_data) > 6 and input_data[-6:] == '.words':
+            predictions = []
             with open(input_data, 'r') as in_file:
-                with open(input_data[:-4] + '_beam-size=' + str(beam_size) + '_predictions.txt', 'w') as out_file:
-                    for line in in_file:
-                        words = line.split()
-                        predictions = memm_viterbi(self.feature2id, self.weights, self.feature2id.get_all_tags(),
-                                                   line, beam_size)
-                        for word, pred in zip(words, predictions):
-                            out_file.write(word + '_' + pred + ' ')
-                        out_file.write('\n')
+                for line in in_file:
+                    line_predictions = []
+                    words = line.split()
+                    prediction = memm_viterbi(self.feature2id, self.weights, line, beam_size)
+                    for word, pred in zip(words, prediction):
+                        line_predictions.append(word+'_'+pred)
+                    predictions.append(line_predictions)
+            return predictions
+
+        if len(input_data) > 5 and input_data[-5:] == '.wtag':
+            pass
+            # with open(input_data[:-4] + '_beam-size=' + str(beam_size) + '_predictions.txt', 'w') as out_file:
+            #     for line in in_file:
+            #         words = line.split()
+            #         predictions = memm_viterbi(self.feature2id, self.weights, self.feature2id.get_all_tags(),
+            #                                    line, beam_size)
+            #         for word, pred in zip(words, predictions):
+            #             out_file.write(word + '_' + pred + ' ')
+            #         out_file.write('\b\n')
 
         else:
-            return memm_viterbi(self.feature2id, self.weights, self.feature2id.get_all_tags(), input_data, beam_size)
+            return memm_viterbi(self.feature2id, self.weights, input_data, beam_size)

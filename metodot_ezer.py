@@ -156,8 +156,6 @@ def nd_history_feature_representation(feature_ids, history, ctag):
 
 
 def calc_features_list(feature_ids, histories_list, ctags_list):
-    # return [represent_history_with_features(feature_ids, histories_list[i], ctags_list[i])
-    #         for i in range(len(histories_list))]
     return [feature_ids.history_feature_representation(histories_list[i], ctags_list[i])
             for i in range(len(histories_list))]
 

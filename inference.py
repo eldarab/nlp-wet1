@@ -6,12 +6,10 @@ from tqdm import tqdm
 
 def calc_q(feature_ids, weights, all_tags, pword, cword, nword, pptag, ptag, ctag):
     history = (cword, pptag, ptag, pword, nword)
-    # feature_rep = represent_history_with_features(feature_ids, history, ctag)
     feature_rep = feature_ids.history_feature_representation(history, ctag)
     numerator = exp(mult_sparse(weights, feature_rep))
     denominator = 0
     for tag in all_tags:
-        # feature_rep = represent_history_with_features(feature_ids, history, tag)
         feature_rep = feature_ids.history_feature_representation(history, tag)
         denominator += exp(mult_sparse(weights, feature_rep))
 
@@ -19,7 +17,8 @@ def calc_q(feature_ids, weights, all_tags, pword, cword, nword, pptag, ptag, cta
 
 
 # TODO implement beam-search
-def memm_viterbi(feature_ids, weights, all_tags, sentence, beam_size):
+def memm_viterbi(feature_ids, weights, sentence, beam_size):
+    all_tags = feature_ids.get_all_tags()
     words_arr = [BEGIN] + get_words_arr(sentence) + [STOP]
     # Offsetting the size of the list to match the mathematical algorithm
     n = len(words_arr) - 2
