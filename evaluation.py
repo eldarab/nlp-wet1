@@ -19,10 +19,8 @@ def accuracy(true_file, predictions_file):
     return errors / total_predictions
 
 
-def confusion_matrix(model, true_file, predictions_file, errors_to_display=10, show=False, order='freq',
-                     slice_on_pred=True):
+def confusion_matrix(true_file, predictions_file, errors_to_display=10, show=False, order='freq', slice_on_pred=True):
     """
-    :param model: Trained log_linear_memm model
     :param true_file: Some text file of the format "word_tag word_tag word_tag word_tag..."
     :param predictions_file: Some text file of the format "word_tag word_tag word_tag word_tag..."
     :param errors_to_display: Number of errors to display in CM, as required in the instructions
@@ -35,7 +33,7 @@ def confusion_matrix(model, true_file, predictions_file, errors_to_display=10, s
     # getting tags
     true_tags = get_file_tags(true_file)
     predicted_tags = get_file_tags(predictions_file)
-    all_possible_tags = model.get_all_tags()
+    all_possible_tags = set(true_tags)
 
     # creating "raw" confusion matrix
     n = len(all_possible_tags)
@@ -82,11 +80,11 @@ def confusion_matrix(model, true_file, predictions_file, errors_to_display=10, s
 
 
 # TODO delete this after conflict with sklearn CM is solved
-def raw_confusion_matrix(model, true_file, predictions_file):
+def raw_confusion_matrix(true_file, predictions_file):
     # getting tags
     true_tags = get_file_tags(true_file)
     predicted_tags = get_file_tags(predictions_file)
-    all_possible_tags = model.get_all_tags()
+    all_possible_tags = set(true_tags)
 
     # creating "raw" confusion matrix
     n = len(all_possible_tags)
