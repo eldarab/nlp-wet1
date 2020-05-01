@@ -82,7 +82,7 @@ class Log_Linear_MEMM:
         with open(pkl_path, 'wb') as f:
             pickle.dump(self, f)
         with open(txt_path, 'w') as f:
-            f.write(filename + '\n')
+            f.write('model name: ' + filename + '\n\n\n')
             f.write('train_path = ' + str(self.train_path) + '\n')
             f.write('dim = ' + str(self.dim) + '\n')
             f.write('threshold = ' + str(self.threshold) + '\n')
@@ -129,6 +129,6 @@ class Log_Linear_MEMM:
                 words = line.split()
                 prediction = memm_viterbi(self.feature2id, self.weights, line, beam_size)
                 for word, pred in zip(words, prediction):
-                    line_predictions.append(word + '_' + pred)
+                    line_predictions.append((word, pred))
                 predictions.append(line_predictions)
         return predictions
