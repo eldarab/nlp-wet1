@@ -2,63 +2,42 @@ from log_linear_memm import Log_Linear_MEMM
 from time import strftime, time
 from evaluation import *
 from emailer import send_email
-from sklearn import metrics  # TODO do not lehagish
-
-
-def notify_email(start_time, preprocess_time, optimization_time, prediction_time):
-    message_body = 'Start: ' + start_time + '\nPreprocess end: ' + preprocess_time + '\nOptimization end: ' + \
-                   optimization_time + '\nPrediction end: ' + prediction_time
-    send_email('eldar.abraham@gmail.com', 'Pa$$w0rd2019', ['eldar.a@campus.technion.ac.il'], message_body)
-
-
-# TODO do not lehagish
-def clean_tags(input_data):
-    with open(input_data, 'r') as in_file:
-        with open(input_data[:-5] + '_clean.txt', 'w') as out_file:
-            for line in in_file:
-                words_tags = line.split()
-                for word_tag in words_tags:
-                    word = word_tag.split('_')[0]
-                    out_file.write(word + ' ')
-                out_file.write('\n')
 
 
 if __name__ == '__main__':
-    start_time = strftime("%Y-%m-%d_%H-%M-%S")
+    # TODO receive hyper-parameters from command line
     train_data = 'data/train1.wtag'
     model = Log_Linear_MEMM()
     model.set_train_path(train_data)
 
     #   Preprocessing
     # TODO maybe add all hyper-parameters as instance variables of the model? self.threshold for example
-    threshold = 10
-    model.preprocess(threshold=threshold, f101=False, f102=False)
-    preprocess_time = strftime("%Y-%m-%d_%H-%M-%S")
+    # threshold = 10
+    # model.preprocess(threshold=threshold, f101=False, f102=False)
+    # preprocess_time = strftime("%Y-%m-%d_%H-%M-%S")
 
     #   Optimizing / loading pre-trained weights
-    optimization_time = strftime("%Y-%m-%d_%H-%M-%S")
-    lam = 0
-    maxiter = 50
-    model.optimize(lam=lam,
-                   maxiter=maxiter,
-                   weights_path='dumps/weights_' + train_data[5:-5] + '_threshold=' + str(threshold) + '_lam=' +
-                                str(lam) + '_iter=' + str(maxiter) + '_' + start_time + '.pkl')
-    # model.load_weights()
+    # lam = 0
+    # maxiter = 50
+    # model.optimize(lam=lam,
+    #                maxiter=maxiter,
+    #                weights_path='dumps/weights_' + train_data[5:-5] + '_threshold=' + str(threshold) + '_lam=' +
+    #                             str(lam) + '_iter=' + str(maxiter) + '_' + start_time + '.pkl')
+    # model.load_weights('dumps/weights_train1_threshold=10_lam=0_iter=50_2020-05-01_13-42-55.pkl')
 
     #   Predict
     # TODO evaluate with different beam sizes
-    # prediction = model.predict('data/debugging_dataset_201_210_clean.txt')
-    prediction_time = strftime("%Y-%m-%d_%H-%M-%S")
+    prediction = model.predict('data/debugging_dataset_201_210_clean.txt')
 
     #   Evaluation
-    # true_file = 'data/debugging_dataset_201_210.wtag'
-    # predictions_file = 'data/debugging_dataset_201_210_clean_predictions.txt'
+    true_file = 'data/debugging_dataset_201_210.wtag'
+    predictions_file = 'data/debugging_dataset_201_210_clean_beam-size=5_predictions.txt'
     # true_tags = get_file_tags(true_file)
     # predicted_tags = get_file_tags(predictions_file)
-    # confusion_matrix(true_file, predictions_file, show=False, slice_on_pred=False, order='freq')
-    # accuracy = accuracy(true_file, predictions_file)
-
-    notify_email(start_time, preprocess_time, optimization_time, prediction_time)
+    confusion_matrix(true_file, predictions_file, show=True, slice_on_pred=False, order='freq')
+    accuracy = accuracy(true_file, predictions_file)
+    print(accuracy)
+    # notify_email(start_time, preprocess_time, optimization_time, prediction_time)
 
     # old testers
     # true_tags_set, predicted_tags_set = set(), set()
