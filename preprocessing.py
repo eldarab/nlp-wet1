@@ -1,5 +1,7 @@
 from collections import OrderedDict
-from auxiliary_functions import *
+from auxiliary_functions import get_words_arr, parse_lower, add_or_append, BEGIN, STOP, has_digit, CONTAINS_DIGIT, \
+    has_hyphen, CONTAINS_HYPHEN, has_upper, CONTAINS_UPPER
+import numpy as np
 
 
 class FeatureStatisticsClass:
@@ -140,7 +142,7 @@ class FeatureStatisticsClass:
                 words_tags_arr = get_words_arr(line)
                 for word_tag in words_tags_arr:
                     cword, ctag = word_tag.split('_')
-                    if not cword.islower():
+                    if has_upper(cword):
                         add_or_append(self.f109_count_dict, (CONTAINS_UPPER, ctag))
 
     def count_f110(self):
@@ -381,7 +383,7 @@ class Feature2Id:
                 words_tags_arr = get_words_arr(line)
                 for word_tag in words_tags_arr:
                     cword, ctag = word_tag.split('_')
-                    if not cword.islower():
+                    if has_upper(cword):
                         pair = (CONTAINS_UPPER, ctag)
                         if pair not in self.f109_index_dict \
                                 and self.feature_statistics.f109_count_dict[pair] >= self.threshold:
@@ -406,7 +408,6 @@ class Feature2Id:
         pword, cword, nword = history[4].lower(), history[0].lower(), history[3].lower()
         pptag, ptag = history[1], history[2]
         features = []
-        has_upper = not history[0].islower()
 
         if (cword, ctag) in self.f100_index_dict:
             features.append(self.f100_index_dict[(cword, ctag)])
@@ -437,7 +438,7 @@ class Feature2Id:
         if has_digit(cword) and (CONTAINS_DIGIT, ctag) in self.f108_index_dict:
             features.append(self.f108_index_dict[(CONTAINS_DIGIT, ctag)])
 
-        if has_upper and (CONTAINS_UPPER, ctag) in self.f109_index_dict:
+        if has_upper(cword) and (CONTAINS_UPPER, ctag) in self.f109_index_dict:
             features.append(self.f109_index_dict[(CONTAINS_UPPER, ctag)])
 
         if has_hyphen(cword) and (CONTAINS_HYPHEN, ctag) in self.f110_index_dict:

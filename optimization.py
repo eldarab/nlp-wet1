@@ -1,6 +1,6 @@
 import numpy as np
 
-from auxiliary_functions import
+from auxiliary_functions import multiply_sparse, exp_multiply_sparse, sparse_dict_to_dense, sparse_to_dense
 from preprocessing import *
 from math import exp, log
 from numpy.linalg import norm
@@ -10,17 +10,27 @@ from concurrent.futures import ThreadPoolExecutor
 def calc_linear_term(v_i, features_list):
     linear_term = 0
     for feature in features_list:
-        linear_term += mult_sparse(v_i, feature)
+        linear_term += multiply_sparse(v_i, feature)
     return linear_term
 
 
-def calc_normalization_term(v_i, features_matrix):
+def calc_normalization_term_old(v_i, features_matrix):
     normalization_term = 0
-    v_i = np.exp(v_i)
     for history in features_matrix:
         tmp = 0
         for feature in history:
-            tmp += exp_multiply_sparse(v_i, feature)
+            tmp += exp(multiply_sparse(v_i, feature))
+        normalization_term += log(tmp)  # natural logarithm
+    return normalization_term
+
+
+def calc_normalization_term_new(v_i, features_matrix):
+    normalization_term = 0
+    exp_v_i = np.exp(v_i)
+    for history in features_matrix:
+        tmp = 0
+        for feature in history:
+            tmp += exp_multiply_sparse(exp_v_i, feature)
         normalization_term += log(tmp)  # natural logarithm
     return normalization_term
 
@@ -28,19 +38,19 @@ def calc_normalization_term(v_i, features_matrix):
 def calc_regularization(v_i, reg_lambda):
     return 0.5 * reg_lambda * (norm(v_i) ** 2)
 
+
 def calc_expected_counts_old(v_i, dim, features_matrix):
     expected_counts = 0
     for history in features_matrix:
         numerator = np.zeros(dim)
         denominator = 0
         for feature in history:
-            denominator += exp(mult_sparse(v_i, feature))
-            numerator += exp(mult_sparse(v_i, feature)) * sparse_to_dense(feature, dim)
+            denominator += exp(multiply_sparse(v_i, feature))
+            numerator += exp(multiply_sparse(v_i, feature)) * sparse_to_dense(feature, dim)
         expected_counts += numerator / denominator
     return expected_counts
 
 
-#  New
 def calc_expected_counts_new(exp_v_i, dim, features_matrix):
     expected_counts = np.zeros(dim)
     exp_v_i = np.exp(exp_v_i)
@@ -92,28 +102,27 @@ def calc_expected_counts_new(exp_v_i, dim, features_matrix):
 #     return (-1) * likelihood, (-1) * grad
 
 
-def calc_objective(v_i, dim, features_list, features_matrix, empirical_counts, reg_lambda):
+def calc_objective(v_i, dim, features_list, features_matrix, empirical_counts, reg_lambda, useNew):
     # calculating linear term
     linear_term = calc_linear_term(v_i, features_list)
-
-    # feat_mat is a np array of all of the features from the train data
-    # linear_term = np.sum(v_i @ feat_mat)
-
-    normalization_term = calc_normalization_term(v_i, features_matrix)
+    normalization_term = calc_normalization_term_new(v_i, features_matrix) if useNew \
+        else calc_expected_counts_old(v_i, features_matrix)
     regularization = calc_regularization(v_i, reg_lambda)  # l2 norm
 
     likelihood = linear_term - normalization_term - regularization
     return -1 * likelihood
 
 
-def calc_gradient(v_i, dim, features_list, features_matrix, empirical_counts, reg_lambda):
+def calc_gradient(v_i, dim, features_list, features_matrix, empirical_counts, reg_lambda, useNew):
     #       Gradient Function
-    expected_counts = calc_expected_counts(v_i, dim, features_matrix)
+    expected_counts = calc_expected_counts_new(v_i, dim, features_matrix) if useNew \
+        else calc_expected_counts_old(v_i, dim, features_matrix)
     regularization_grad = reg_lambda * v_i
 
     gradient = empirical_counts - expected_counts - regularization_grad
 
     return (-1) * gradient
+
 
 # TODO compare this to regular version and consider multiprocessing
 """
@@ -136,4 +145,3 @@ def calc_objective_and_grad_with_threading(v_i, dim, features_list, features_mat
 
     return (-1) * likelihood, (-1) * grad
 """
-
