@@ -256,6 +256,7 @@ class Feature2Id:
                         self.f100_counter += 1
         self.total_features += self.f100_counter
 
+    # TODO weight this feature
     def initialize_f101_index_dict(self):
         with open(self.file_path) as f:
             for line in f:
@@ -272,6 +273,7 @@ class Feature2Id:
                             self.f101_counter += 1
         self.total_features += self.f101_counter
 
+    # TODO weight this feature
     def initialize_f102_index_dict(self):
         with open(self.file_path) as f:
             for line in f:
