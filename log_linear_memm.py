@@ -40,6 +40,9 @@ class Log_Linear_MEMM:
         self.f109 = f109
         self.f110 = f110
 
+    def __sub__(self, other):
+        return np.linalg.norm(self.weights-other.weights)
+
     def preprocess(self):
         self.feature_statistics = FeatureStatisticsClass(self.train_path)
         self.feature_statistics.count_features(self.f100, self.f101, self.f102, self.f103, self.f104, self.f105,
@@ -49,7 +52,7 @@ class Log_Linear_MEMM:
                                                self.f106, self.f107, self.f108, self.f109, self.f110)
         self.dim = self.feature2id.total_features
 
-    def optimize(self, iprint=1, use_new=True):
+    def optimize(self, use_new, iprint=1):
         # initializing parameters for fmin_l_bfgs_b
         all_tags_list = self.feature2id.get_all_tags()
         all_histories, all_corresponding_tags = get_all_histories_ctags(self.train_path)  # abuse of notation :)
@@ -63,14 +66,14 @@ class Log_Linear_MEMM:
         self.lbfgs_result = optimal_params
         self.weights = optimal_params[0]
 
-    def fit(self, train_path):
+    def fit(self, train_path, use_new):
         """
         A simple interface to train a model.
         :param train_path: A path for training data, *.wtag format.
         """
         self.train_path = train_path
         self.preprocess()
-        self.optimize()
+        self.optimize(use_new)
 
     def save(self, filename='model_' + strftime("%Y-%m-%d_%H-%M-%S")):
         pkl_path = 'dumps/' + filename + '.pkl'
