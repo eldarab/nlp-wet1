@@ -11,6 +11,7 @@ from preprocessing import FeatureStatisticsClass, Feature2Id
 from auxiliary_functions import get_all_histories_ctags, calc_features_list, build_features_mat, get_file_tags, \
     get_predictions_list, clean_tags
 from optimization import calc_empirical_counts, calc_objective, calc_gradient
+from numpy.linalg import norm
 
 sns.set()
 
@@ -41,7 +42,7 @@ class Log_Linear_MEMM:
         self.f110 = f110
 
     def __sub__(self, other):
-        return np.linalg.norm(self.weights-other.weights)
+        return self.weights @ other.weights / (norm(self.weights) * norm(other.weights))
 
     def preprocess(self):
         self.feature_statistics = FeatureStatisticsClass(self.train_path)
