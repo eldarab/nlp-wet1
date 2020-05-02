@@ -1,7 +1,7 @@
 from preprocessing import *
 from optimization import *
 from inference import *
-from metodot_ezer import *
+from auxiliary_functions import *
 from scipy.optimize import fmin_l_bfgs_b
 import pickle
 import numpy as np
@@ -81,7 +81,7 @@ class Log_Linear_MEMM:
             f.write('train_path = ' + str(self.train_path) + '\n')
             f.write('dim = ' + str(self.dim) + '\n')
             f.write('threshold = ' + str(self.threshold) + '\n')
-            f.write('fix_threshold = ' + str(self.fix_threshold) + '\n')
+            f.write('fix_threshold = ' + str(self.fix_threshold) + ' has no meaning if f101, f102 are False' + '\n')
             f.write('lam = ' + str(self.lam) + '\n')
             f.write('maxiter = ' + str(self.maxiter) + '\n')
             f.write('f100 = ' + str(self.f100) + '\n')
@@ -104,7 +104,6 @@ class Log_Linear_MEMM:
         :param input_data: string or file path
         :return: A "predictions" matrix with a tuple (word, pred) in the [i][j] cell.
         """
-        # TODO maybe save prediction file as parameter of the model?
         if len(input_data) > 6 and input_data[-6:] == '.words':
             return self.__predict_file(input_data, beam_size)
 

@@ -14,7 +14,6 @@ def calc_q(feature_ids, weights, all_tags, pword, cword, nword, pptag, ptag, cta
     return numerator / denominator
 
 
-# TODO implement beam-search
 def memm_viterbi(feature_ids, weights, sentence, beam_size):
     all_tags = feature_ids.get_all_tags()
     words_arr = [BEGIN] + get_words_arr(sentence) + [STOP]

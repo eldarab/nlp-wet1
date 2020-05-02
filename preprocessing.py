@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from metodot_ezer import *
+from auxiliary_functions import *
 
 
 class FeatureStatisticsClass:
@@ -13,7 +13,6 @@ class FeatureStatisticsClass:
         self.f105_count_dict = OrderedDict()  # Unigram features
         self.f106_count_dict = OrderedDict()  # Previous word + tag
         self.f107_count_dict = OrderedDict()  # Next word + tag
-        # TODO add new features to count_features, initialize_index_dict, and preprocess (in log_linear_memm)
         self.f108_count_dict = OrderedDict()  # Contain Number features
         self.f109_count_dict = OrderedDict()  # Contain Uppercase features
         self.f110_count_dict = OrderedDict()  # Contain Hyphen features
@@ -196,6 +195,8 @@ class Feature2Id:
         :param f103: True if f103 should be initialized
         :param f104: True if f104 should be initialized
         :param f105: True if f105 should be initialized
+        :param f106: True if f105 should be initialized
+        :param f107: True if f105 should be initialized
         :param f108: True if f108 should be initialized
         :param f109: True if f109 should be initialized
         :param f110: True if f110 should be initialized
@@ -249,11 +250,9 @@ class Feature2Id:
                 words_tags_arr = get_words_arr(line)
                 for word_tag in words_tags_arr:
                     cword, ctag = parse_lower(word_tag)
-                    # TODO create a function that performs this:
                     if (cword, ctag) not in self.f100_index_dict \
                             and self.feature_statistics.f100_count_dict[(cword, ctag)] >= self.threshold:
                         self.f100_index_dict[(cword, ctag)] = self.f100_counter + self.total_features
-                        # TODO compare to colab example
                         self.f100_counter += 1
         self.total_features += self.f100_counter
 
@@ -403,7 +402,6 @@ class Feature2Id:
                             self.f110_counter += 1
         self.total_features += self.f110_counter
 
-    # TODO consider changing this to receive a master feature index
     def history_feature_representation(self, history, ctag):
         pword, cword, nword = history[4].lower(), history[0].lower(), history[3].lower()
         pptag, ptag = history[1], history[2]

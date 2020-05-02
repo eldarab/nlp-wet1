@@ -57,22 +57,16 @@ def get_file_tags(file):
     return labels
 
 
-# TODO check which implementation is faster
 def has_digit(word):
     for char in word:
         if char.isdigit():
             return True
-    # return any(char.isdigit() for char in word)
-    # return bool(search(r'\d', word))
 
 
-# TODO check which implementation is faster
 def has_hyphen(word):
     for char in word:
         if char == '-':
             return True
-    # return any(char == '_' for char in word)
-    # return bool(search('-', word))
 
 
 """
