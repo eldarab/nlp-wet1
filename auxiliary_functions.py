@@ -9,6 +9,8 @@ CONTAINS_DIGIT = '*CD'
 CONTAINS_UPPER = '*CU'
 CONTAINS_HYPHEN = '*CH'
 
+# TODO check what functions is being used and is necessary
+
 
 def mult_sparse(v, f):
     res = 0
@@ -17,11 +19,18 @@ def mult_sparse(v, f):
     return res
 
 
-def add_or_append(dictionary, item):
+def exp_multiply_sparse(v, f):
+    res = 1
+    for i in f:
+        res *= v[i]
+    return res
+
+
+def add_or_append(dictionary, item, size=1):
     if item not in dictionary:
-        dictionary[item] = 1
+        dictionary[item] = size
     else:
-        dictionary[item] += 1
+        dictionary[item] += size
 
 
 def parse_lower(word_tag):
@@ -151,29 +160,29 @@ def nd_history_feature_representation(feature_ids, history, ctag):
 
 
 def calc_features_list(feature_ids, histories_list, ctags_list):
-    return [feature_ids.history_feature_representation(histories_list[i], ctags_list[i])
-            for i in range(len(histories_list))]
+    return np.array([feature_ids.history_feature_representation(histories_list[i], ctags_list[i])
+                    for i in range(len(histories_list))])
 
 
 def build_features_mat(feature_ids, all_histories_list, all_tags_list):
     row_dim = len(all_histories_list)
     col_dim = len(all_tags_list)
-    feature_mat = [[feature_ids.history_feature_representation(all_histories_list[i], all_tags_list[j])
-                    for j in range(col_dim)] for i in range(row_dim)]
+    feature_mat = np.array([[feature_ids.history_feature_representation(all_histories_list[i], all_tags_list[j])
+                            for j in range(col_dim)] for i in range(row_dim)])
     return feature_mat
-
-
-def calc_empirical_counts(features_list, dim):
-    empirical_counts = np.zeros(dim)
-    for feature in features_list:
-        empirical_counts += sparse_to_dense(feature, dim)
-    return empirical_counts
 
 
 def sparse_to_dense(sparse_vec, dim):
     dense_vec = np.zeros(dim)
     for entrance in sparse_vec:
         dense_vec[entrance] += 1
+    return dense_vec
+
+
+def sparse_dict_to_dense(sparse_dict, dim):
+    dense_vec = np.zeros(dim)
+    for entrance in sparse_dict:
+        dense_vec[entrance] = sparse_dict[entrance]
     return dense_vec
 
 

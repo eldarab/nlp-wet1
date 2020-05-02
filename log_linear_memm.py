@@ -24,7 +24,7 @@ class Log_Linear_MEMM:
         self.lbfgs_result = None
         self.dim = None
         self.threshold = threshold
-        self.fix_threshold = fix_threshold
+        self.fix_threshold = fix_threshold if fix_threshold >= 0 else threshold
         self.lam = lam
         self.maxiter = maxiter
         self.f100 = f100

@@ -1,3 +1,6 @@
+import numpy as np
+
+from auxiliary_functions import
 from preprocessing import *
 from math import exp, log
 from numpy.linalg import norm
@@ -13,10 +16,11 @@ def calc_linear_term(v_i, features_list):
 
 def calc_normalization_term(v_i, features_matrix):
     normalization_term = 0
+    v_i = np.exp(v_i)
     for history in features_matrix:
         tmp = 0
         for feature in history:
-            tmp += exp(mult_sparse(v_i, feature))
+            tmp += exp_multiply_sparse(v_i, feature)
         normalization_term += log(tmp)  # natural logarithm
     return normalization_term
 
@@ -24,8 +28,7 @@ def calc_normalization_term(v_i, features_matrix):
 def calc_regularization(v_i, reg_lambda):
     return 0.5 * reg_lambda * (norm(v_i) ** 2)
 
-
-def calc_expected_counts(v_i, dim, features_matrix):
+def calc_expected_counts_old(v_i, dim, features_matrix):
     expected_counts = 0
     for history in features_matrix:
         numerator = np.zeros(dim)
@@ -37,22 +40,59 @@ def calc_expected_counts(v_i, dim, features_matrix):
     return expected_counts
 
 
-def calc_objective_and_grad(v_i, dim, features_list, features_matrix, empirical_counts,
-                            reg_lambda):
-    """
-    Generates objective and gradient to use in fmin_l_bfgs_b in a single iteration
-    :param v_i: [[DENSE]] Parameter to optimize at iteration i
-    :param dim: [[SCALAR]] the dimension of the space we optimize in
-    :param features_list: [[SPARSE]] A list of the sparse feature representation of all histories in corpus, i.e. f(xi,yi)
-    :param features_matrix: [[SPARSE]] A matrix containing sparse feature representation of all histories combined with
-    all tags in corpus, i.e. f(xi,y') for each y' in tags
-    :param empirical_counts: [[DENSE]] A dense representation of empirical_counts
-    :param expected_counts_vec: [[DENSE]] A dense representation of expected_counts numerator, without p(y'|x;v) scalar
-    :param reg_lambda: [[SCALAR]] Hyper-parameter that controls regularization
-    :return: A tuple of the likelihood (objective) and it's gradient to pass to fmin_l_bfgs_b
-    """
+#  New
+def calc_expected_counts_new(exp_v_i, dim, features_matrix):
+    expected_counts = np.zeros(dim)
+    exp_v_i = np.exp(exp_v_i)
+    res = np.empty((len(features_matrix), dim))
+    for i in range(len(features_matrix)):
+        denominator = 0
+        index_weights = {}
+        for feature in features_matrix[i]:
+            temp = exp_multiply_sparse(exp_v_i, feature)
+            denominator += temp
 
-    #       Objective Function
+            for f in feature:
+                add_or_append(index_weights, f, size=temp)
+
+        expected_counts += sparse_dict_to_dense(index_weights, dim) / denominator
+    return expected_counts
+
+
+# def calc_objective_and_grad(v_i, dim, features_list, features_matrix, empirical_counts, reg_lambda):
+#     """
+#     Generates objective and gradient to use in fmin_l_bfgs_b in a single iteration
+#     :param v_i: [[DENSE]] Parameter to optimize at iteration i
+#     :param dim: [[SCALAR]] the dimension of the space we optimize in
+#     :param features_list: [[SPARSE]] A list of the sparse feature representation of all histories in corpus, i.e. f(xi,yi)
+#     :param features_matrix: [[SPARSE]] A matrix containing sparse feature representation of all histories combined with
+#     all tags in corpus, i.e. f(xi,y') for each y' in tags
+#     :param empirical_counts: [[DENSE]] A dense representation of empirical_counts
+#     :param expected_counts_vec: [[DENSE]] A dense representation of expected_counts numerator, without p(y'|x;v) scalar
+#     :param reg_lambda: [[SCALAR]] Hyper-parameter that controls regularization
+#     :return: A tuple of the likelihood (objective) and it's gradient to pass to fmin_l_bfgs_b
+#     """
+#     #       Objective Function
+#     # calculating linear term
+#     linear_term = calc_linear_term(v_i, features_list)
+#
+#     # feat_mat is a np array of all of the features from the train data
+#     # linear_term = np.sum(v_i @ feat_mat)
+#
+#     normalization_term = calc_normalization_term(v_i, features_matrix)
+#     regularization = calc_regularization(v_i, reg_lambda)  # l2 norm
+#
+#     #       Gradient Function
+#     expected_counts = calc_expected_counts(v_i, dim, features_matrix)
+#     regularization_grad = reg_lambda * v_i
+#
+#     likelihood = linear_term - normalization_term - regularization
+#     grad = empirical_counts - expected_counts - regularization_grad
+#
+#     return (-1) * likelihood, (-1) * grad
+
+
+def calc_objective(v_i, dim, features_list, features_matrix, empirical_counts, reg_lambda):
     # calculating linear term
     linear_term = calc_linear_term(v_i, features_list)
 
@@ -62,16 +102,21 @@ def calc_objective_and_grad(v_i, dim, features_list, features_matrix, empirical_
     normalization_term = calc_normalization_term(v_i, features_matrix)
     regularization = calc_regularization(v_i, reg_lambda)  # l2 norm
 
+    likelihood = linear_term - normalization_term - regularization
+    return -1 * likelihood
+
+
+def calc_gradient(v_i, dim, features_list, features_matrix, empirical_counts, reg_lambda):
     #       Gradient Function
     expected_counts = calc_expected_counts(v_i, dim, features_matrix)
     regularization_grad = reg_lambda * v_i
 
-    likelihood = linear_term - normalization_term - regularization
-    grad = empirical_counts - expected_counts - regularization_grad
+    gradient = empirical_counts - expected_counts - regularization_grad
 
-    return (-1) * likelihood, (-1) * grad
+    return (-1) * gradient
 
-
+# TODO compare this to regular version and consider multiprocessing
+"""
 def calc_objective_and_grad_with_threading(v_i, dim, features_list, features_matrix, empirical_counts,
                                            reg_lambda):
     with ThreadPoolExecutor(max_workers=4) as executor:
@@ -90,3 +135,5 @@ def calc_objective_and_grad_with_threading(v_i, dim, features_list, features_mat
         grad = empirical_counts - expected_counts - regularization_grad
 
     return (-1) * likelihood, (-1) * grad
+"""
+
