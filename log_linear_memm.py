@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 sns.set()
 
 
-class LogLinearMEMM:
+class Log_Linear_MEMM:
     def __init__(self, threshold=10, fix_threshold=50, lam=0, maxiter=100, f100=True, f101=True, f102=True, f103=True,
                  f104=True, f105=True, f106=True, f107=True, f108=True, f109=True, f110=True):
         self.train_path = None
@@ -102,6 +102,7 @@ class LogLinearMEMM:
         File can be in either .wtag or .words format.
         :param beam_size: a parameter of the viterbi
         :param input_data: string or file path
+        :return: A "predictions" matrix with a tuple (word, pred) in the [i][j] cell.
         """
         # TODO maybe save prediction file as parameter of the model?
         if len(input_data) > 6 and input_data[-6:] == '.words':

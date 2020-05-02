@@ -1,8 +1,6 @@
 from math import exp
 from preprocessing import *
 
-from tqdm import tqdm
-
 
 def calc_q(feature_ids, weights, all_tags, pword, cword, nword, pptag, ptag, ctag):
     history = (cword, pptag, ptag, pword, nword)
@@ -33,7 +31,7 @@ def memm_viterbi(feature_ids, weights, sentence, beam_size):
 
     cword, nword = words_arr[0], words_arr[1]
 
-    for k in tqdm(range(1, n + 1)):
+    for k in range(1, n + 1):
         pword = cword
         cword = nword
         nword = words_arr[k + 1]
