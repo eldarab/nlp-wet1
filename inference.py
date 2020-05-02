@@ -1,15 +1,15 @@
 from math import exp
-from preprocessing import *
+from auxiliary_functions import multiply_sparse, BEGIN, STOP, get_words_arr
 
 
 def calc_q(feature_ids, weights, all_tags, pword, cword, nword, pptag, ptag, ctag):
     history = (cword, pptag, ptag, pword, nword)
     feature_rep = feature_ids.history_feature_representation(history, ctag)
-    numerator = exp(mult_sparse(weights, feature_rep))
+    numerator = exp(multiply_sparse(weights, feature_rep))
     denominator = 0
     for tag in all_tags:
         feature_rep = feature_ids.history_feature_representation(history, tag)
-        denominator += exp(mult_sparse(weights, feature_rep))
+        denominator += exp(multiply_sparse(weights, feature_rep))
 
     return numerator / denominator
 
@@ -53,37 +53,6 @@ def memm_viterbi(feature_ids, weights, sentence, beam_size):
         beam_list.sort(reverse=True, key=lambda item: item[1])
         if beam_size != 0:
             tags_dict[k] = [beam_list[i][0] for i in range(beam_size)]
-
-    # for k in tqdm(range(1, n + 1)):
-    #     pword = cword
-    #     cword = nword
-    #     nword = words_arr[k + 1]
-    #
-    #     for v in all_tags:
-    #         if k == 1:
-    #             pi[1][(BEGIN, v)] = calc_q(feature_ids, weights, all_tags, pword, cword, nword, BEGIN, BEGIN, v)
-    #             # No need for setting a value for bp because it is only used for k >= 3
-    #             continue
-    #
-    #         for u in all_tags:
-    #             if k == 2:
-    #                 if pi[1][(BEGIN, u)] == 0:
-    #                     continue
-    #
-    #                 q = calc_q(feature_ids, weights, all_tags, pword, cword, nword, BEGIN, u, v)
-    #                 pi[2][(u, v)] = pi[1][(BEGIN, u)] * q
-    #                 # Not setting value for bp
-    #                 continue
-    #
-    #             pi[k][(u, v)] = 0
-    #             for t in all_tags:
-    #                 if pi[k-1][(t, u)] == 0:
-    #                     continue
-    #
-    #                 q = calc_q(feature_ids, weights, all_tags, pword, cword, nword, t, u, v)
-    #                 if pi[k - 1][(t, u)] * q > pi[k][(u, v)]:
-    #                     pi[k][(u, v)] = pi[k - 1][(t, u)] * q
-    #                     bp[k][(u, v)] = t
 
     tag_sequence = [None for i in range(n + 1)]
     max_prob = 0
