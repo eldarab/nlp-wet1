@@ -51,8 +51,6 @@ def calc_expected_counts(v_i, dim, features_matrix):
         expected_counts += sparse_dict_to_dense(index_weights, dim) / denominator
     return expected_counts
 
-
-
 # def calc_objective_and_grad(v_i, dim, features_list, features_matrix, empirical_counts, reg_lambda):
 #     """
 #     Generates objective and gradient to use in fmin_l_bfgs_b in a single iteration
