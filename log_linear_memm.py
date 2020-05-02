@@ -17,7 +17,7 @@ sns.set()
 
 
 class Log_Linear_MEMM:
-    def __init__(self, threshold=10, fix_threshold=50, lam=0, maxiter=100, f100=True, f101=True, f102=True, f103=True,
+    def __init__(self, threshold=10, fix_threshold=50, lam=0, maxiter=200, f100=True, f101=True, f102=True, f103=True,
                  f104=True, f105=True, f106=True, f107=True, f108=True, f109=True, f110=True):
         self.train_path = None
         self.feature_statistics = None
@@ -53,7 +53,7 @@ class Log_Linear_MEMM:
                                                self.f106, self.f107, self.f108, self.f109, self.f110)
         self.dim = self.feature2id.total_features
 
-    def optimize(self, use_new, iprint=1):
+    def optimize(self, use_new, iprint=20):
         # initializing parameters for fmin_l_bfgs_b
         all_tags_list = self.feature2id.get_all_tags()
         all_histories, all_corresponding_tags = get_all_histories_ctags(self.train_path)  # abuse of notation :)
@@ -86,7 +86,7 @@ class Log_Linear_MEMM:
             f.write('train_path = ' + str(self.train_path) + '\n')
             f.write('dim = ' + str(self.dim) + '\n')
             f.write('threshold = ' + str(self.threshold) + '\n')
-            f.write('fix_threshold = ' + str(self.fix_threshold) + ' has no meaning if f101, f102 are False' + '\n')
+            f.write('fix_threshold = ' + str(self.fix_threshold) + ' (has no meaning if f101, f102 are False)' + '\n')
             f.write('lam = ' + str(self.lam) + '\n')
             f.write('maxiter = ' + str(self.maxiter) + '\n')
             f.write('f100 = ' + str(self.f100) + '\n')
