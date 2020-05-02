@@ -86,7 +86,8 @@ class Log_Linear_MEMM:
             f.write('train_path = ' + str(self.train_path) + '\n')
             f.write('dim = ' + str(self.dim) + '\n')
             f.write('threshold = ' + str(self.threshold) + '\n')
-            f.write('fix_threshold = ' + str(self.fix_threshold) + ' (has no meaning if f101, f102 are False)' + '\n')
+            f.write('fix_threshold = ' + str(self.fix_threshold) +
+                    (' has no meaning' if not self.f101 and not self.f102 else '') + '\n')
             f.write('lam = ' + str(self.lam) + '\n')
             f.write('maxiter = ' + str(self.maxiter) + '\n')
             f.write('f100 = ' + str(self.f100) + '\n')

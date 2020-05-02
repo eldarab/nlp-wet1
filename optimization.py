@@ -65,13 +65,16 @@ def calc_expected_counts_new(v_i, dim, features_matrix):
     exp_v_i = np.exp(v_i)
     for history in features_matrix:
         denominator = 0
-        index_weights = {}
+        # index_weights = {}
+        numerator = np.zeros(dim)
         for feature in history:
             temp = exp_multiply_sparse(exp_v_i, feature)
             denominator += temp
             for f in feature:
-                add_or_append(index_weights, f, size=temp)
-        expected_counts += sparse_dict_to_dense(index_weights, dim) / denominator
+                # add_or_append(index_weights, f, size=temp)
+                numerator[f] += temp
+        # expected_counts += sparse_dict_to_dense(index_weights, dim) / denominator
+        expected_counts += numerator / denominator
     return expected_counts
 
 # def calc_objective_and_grad(v_i, dim, features_list, features_matrix, empirical_counts, reg_lambda):
