@@ -21,7 +21,17 @@ def calc_linear_term(v_i, features_list):
     return linear_term
 
 
-def calc_normalization_term(v_i, features_matrix):
+def calc_normalization_term_old(v_i, features_matrix):
+    normalization_term = 0
+    for history in features_matrix:
+        tmp = 0
+        for feature in history:
+            tmp += exp(multiply_sparse(v_i, feature))
+        normalization_term += log(tmp)  # natural logarithm
+    return normalization_term
+
+
+def calc_normalization_term_new(v_i, features_matrix):
     normalization_term = 0
     exp_v_i = np.exp(v_i)
     for history in features_matrix:
@@ -36,18 +46,31 @@ def calc_regularization(v_i, reg_lambda):
     return 0.5 * reg_lambda * (norm(v_i) ** 2)
 
 
-def calc_expected_counts(v_i, dim, features_matrix):
+def calc_expected_counts_old(v_i, dim, features_matrix):
     expected_counts = np.zeros(dim)
-    exp_v_i = np.exp(v_i)
     for i in range(len(features_matrix)):
         denominator = 0
-        index_weights = {}
+        numerator = np.zeros(dim)
         for feature in features_matrix[i]:
+            temp = exp(multiply_sparse(v_i, feature))
+            denominator += temp
+            numerator += temp * sparse_to_dense(feature, dim)
+
+        expected_counts += numerator / denominator
+    return expected_counts
+
+
+def calc_expected_counts_new(v_i, dim, features_matrix):
+    expected_counts = np.zeros(dim)
+    exp_v_i = np.exp(v_i)
+    for history in features_matrix:
+        denominator = 0
+        index_weights = {}
+        for feature in history:
             temp = exp_multiply_sparse(exp_v_i, feature)
             denominator += temp
             for f in feature:
                 add_or_append(index_weights, f, size=temp)
-
         expected_counts += sparse_dict_to_dense(index_weights, dim) / denominator
     return expected_counts
 
@@ -86,20 +109,22 @@ def calc_expected_counts(v_i, dim, features_matrix):
 
 def calc_objective(v_i, dim, features_list, features_matrix, empirical_counts, reg_lambda, use_new):
     linear_term = calc_linear_term(v_i, features_list)
-    normalization_term = calc_normalization_term(v_i, features_matrix)
+    normalization_term = calc_normalization_term_new(v_i, features_matrix) if use_new \
+        else calc_normalization_term_old(v_i, features_matrix)
+
     regularization = calc_regularization(v_i, reg_lambda)
 
     likelihood = linear_term - normalization_term - regularization
     return -1 * likelihood
 
 
-def calc_gradient(v_i, dim, features_list, features_matrix, empirical_counts, reg_lambda, useNew):
-    #       Gradient Function
-    expected_counts = calc_expected_counts(v_i, dim, features_matrix)
+def calc_gradient(v_i, dim, features_list, features_matrix, empirical_counts, reg_lambda, use_new):
+    expected_counts = calc_expected_counts_new(v_i, dim, features_matrix) if use_new \
+        else calc_expected_counts_old(v_i, dim, features_matrix)
+
     regularization_grad = reg_lambda * v_i
 
     gradient = empirical_counts - expected_counts - regularization_grad
-
     return (-1) * gradient
 
 

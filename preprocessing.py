@@ -51,6 +51,7 @@ class FeatureStatisticsClass:
                     cword, ctag = parse_lower(word_tag)
                     add_or_append(self.f100_count_dict, (cword, ctag))
 
+    # TODO give different weights according to the length of the prefix/suffix
     def count_f101(self):
         with open(self.file_path) as f:
             for line in f:
