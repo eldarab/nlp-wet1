@@ -23,4 +23,4 @@ def notify_email(start_time, preprocess_time, optimization_time, prediction_time
     # TODO put this to use
     message_body = 'Start: ' + start_time + '\nPreprocess end: ' + preprocess_time + '\nOptimization end: ' + \
                    optimization_time + '\nPrediction end: ' + prediction_time
-    send_email('eldar.abraham@gmail.com', 'Pa$$w0rd2019', ['eldar.a@campus.technion.ac.il'], message_body)
+    send_email('eldar.abraham@gmail.com', '<>', ['eldar.a@campus.technion.ac.il'], message_body)
