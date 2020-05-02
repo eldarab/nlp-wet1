@@ -1,16 +1,17 @@
-from preprocessing import *
-from optimization import *
-from inference import *
-from auxiliary_functions import *
-from scipy.optimize import fmin_l_bfgs_b
 import pickle
+import matplotlib.pyplot as plt
 import numpy as np
-from inference import memm_viterbi
-from time import strftime
-from os import remove
 import pandas as pd
 import seaborn as sns
-import matplotlib.pyplot as plt
+from os import remove
+from time import strftime
+from scipy.optimize import fmin_l_bfgs_b
+from inference import memm_viterbi
+from preprocessing import FeatureStatisticsClass, Feature2Id
+from auxiliary_functions import get_all_histories_ctags, calc_features_list, build_features_mat, get_file_tags, \
+    get_predictions_list, clean_tags
+from optimization import calc_empirical_counts, calc_objective, calc_gradient
+
 sns.set()
 
 
@@ -48,17 +49,17 @@ class Log_Linear_MEMM:
                                                self.f106, self.f107, self.f108, self.f109, self.f110)
         self.dim = self.feature2id.total_features
 
-    def optimize(self, iprint=1):
+    def optimize(self, iprint=1, use_new=True):
         # initializing parameters for fmin_l_bfgs_b
         all_tags_list = self.feature2id.get_all_tags()
         all_histories, all_corresponding_tags = get_all_histories_ctags(self.train_path)  # abuse of notation :)
         features_list = calc_features_list(self.feature2id, all_histories, all_corresponding_tags)
         features_matrix = build_features_mat(self.feature2id, all_histories, all_tags_list)
         empirical_counts = calc_empirical_counts(features_list, self.dim)
-        args = (self.dim, features_list, features_matrix, empirical_counts, self.lam)
+        args = (self.dim, features_list, features_matrix, empirical_counts, self.lam, use_new)
         w_0 = np.random.random(self.dim)
-        optimal_params = fmin_l_bfgs_b(func=calc_objective_and_grad, x0=w_0, args=args, maxiter=self.maxiter,
-                                       iprint=iprint)
+        optimal_params = fmin_l_bfgs_b(func=calc_objective, fprime=calc_gradient, x0=w_0, args=args,
+                                       maxiter=self.maxiter, iprint=iprint)
         self.lbfgs_result = optimal_params
         self.weights = optimal_params[0]
 
@@ -116,7 +117,7 @@ class Log_Linear_MEMM:
 
         return memm_viterbi(self.feature2id, self.weights, input_data, beam_size)
 
-    # This is a function that is not to be used by anyone other than the function predict
+    # This is a function that is not used by anyone other than the function predict
     def __predict_file(self, file, beam_size):
         with open(file, 'r') as in_file:
             predictions = []
@@ -207,7 +208,8 @@ class Log_Linear_MEMM:
         return cm
 
     @staticmethod
-    def create_predictions_file(predictions, file_name=r'predictions/prediction_'+strftime("%Y-%m-%d_%H-%M-%S")+'.txt'):
+    def create_predictions_file(predictions,
+                                file_name=r'predictions/prediction_' + strftime("%Y-%m-%d_%H-%M-%S") + '.txt'):
         with open(file=file_name, mode='w') as predictions_file:
-            predictions_file.write('\n'.join(' '.join([word+'_'+tag for word, tag in sentence_prediction])
+            predictions_file.write('\n'.join(' '.join([word + '_' + tag for word, tag in sentence_prediction])
                                              for sentence_prediction in predictions))

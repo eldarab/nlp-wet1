@@ -1,6 +1,4 @@
 import numpy as np
-from re import search
-from tqdm import tqdm
 import pickle
 
 BEGIN = '*B'

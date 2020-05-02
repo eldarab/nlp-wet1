@@ -1,10 +1,17 @@
 import numpy as np
-
-from auxiliary_functions import multiply_sparse, exp_multiply_sparse, sparse_dict_to_dense, sparse_to_dense
-from preprocessing import *
+from auxiliary_functions import multiply_sparse, exp_multiply_sparse, sparse_dict_to_dense, sparse_to_dense, \
+    add_or_append
 from math import exp, log
 from numpy.linalg import norm
+
 from concurrent.futures import ThreadPoolExecutor
+
+
+def calc_empirical_counts(features_list, dim):
+    empirical_counts = np.zeros(dim)
+    for feature in features_list:
+        empirical_counts += sparse_to_dense(feature, dim)
+    return empirical_counts
 
 
 def calc_linear_term(v_i, features_list):
@@ -14,6 +21,7 @@ def calc_linear_term(v_i, features_list):
     return linear_term
 
 
+# Uses math.exp and multiply_sparse
 def calc_normalization_term_old(v_i, features_matrix):
     normalization_term = 0
     for history in features_matrix:
@@ -24,6 +32,7 @@ def calc_normalization_term_old(v_i, features_matrix):
     return normalization_term
 
 
+# uses np.exp and exp_multiply_sparse
 def calc_normalization_term_new(v_i, features_matrix):
     normalization_term = 0
     exp_v_i = np.exp(v_i)
@@ -39,6 +48,7 @@ def calc_regularization(v_i, reg_lambda):
     return 0.5 * reg_lambda * (norm(v_i) ** 2)
 
 
+# Uses math.exp, multiply_sparse and sparse to dense
 def calc_expected_counts_old(v_i, dim, features_matrix):
     expected_counts = 0
     for history in features_matrix:
@@ -51,6 +61,7 @@ def calc_expected_counts_old(v_i, dim, features_matrix):
     return expected_counts
 
 
+# Uses np.exp, exp_multiply_sparse and sparse_dict_to_dense
 def calc_expected_counts_new(exp_v_i, dim, features_matrix):
     expected_counts = np.zeros(dim)
     exp_v_i = np.exp(exp_v_i)
@@ -102,12 +113,11 @@ def calc_expected_counts_new(exp_v_i, dim, features_matrix):
 #     return (-1) * likelihood, (-1) * grad
 
 
-def calc_objective(v_i, dim, features_list, features_matrix, empirical_counts, reg_lambda, useNew):
-    # calculating linear term
+def calc_objective(v_i, dim, features_list, features_matrix, empirical_counts, reg_lambda, use_new):
     linear_term = calc_linear_term(v_i, features_list)
-    normalization_term = calc_normalization_term_new(v_i, features_matrix) if useNew \
-        else calc_expected_counts_old(v_i, features_matrix)
-    regularization = calc_regularization(v_i, reg_lambda)  # l2 norm
+    normalization_term = calc_normalization_term_new(v_i, features_matrix) if use_new \
+        else calc_normalization_term_old(v_i, features_matrix)
+    regularization = calc_regularization(v_i, reg_lambda)
 
     likelihood = linear_term - normalization_term - regularization
     return -1 * likelihood
