@@ -118,9 +118,6 @@ def calc_objective(v_i, dim, features_list, features_matrix, empirical_counts, r
     return -1 * likelihood
 
 
-def calc_gradient(v_i, dim, features_list, features_matrix, empirical_counts, reg_lambda):
-    #       Gradient Function
-    expected_counts = calc_expected_counts(v_i, dim, features_matrix)
 def calc_gradient(v_i, dim, features_list, features_matrix, empirical_counts, reg_lambda, use_new):
     expected_counts = calc_expected_counts_new(v_i, dim, features_matrix) if use_new \
         else calc_expected_counts_old(v_i, dim, features_matrix)
