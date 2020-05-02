@@ -53,28 +53,28 @@ class Log_Linear_MEMM:
                                                self.f106, self.f107, self.f108, self.f109, self.f110)
         self.dim = self.feature2id.total_features
 
-    def optimize(self, use_new, iprint=1):
+    def optimize(self, iprint=1):
         # initializing parameters for fmin_l_bfgs_b
         all_tags_list = self.feature2id.get_all_tags()
         all_histories, all_corresponding_tags = get_all_histories_ctags(self.train_path)  # abuse of notation :)
         features_list = calc_features_list(self.feature2id, all_histories, all_corresponding_tags)
         features_matrix = build_features_mat(self.feature2id, all_histories, all_tags_list)
         empirical_counts = calc_empirical_counts(features_list, self.dim)
-        args = (self.dim, features_list, features_matrix, empirical_counts, self.lam, use_new)
+        args = (self.dim, features_list, features_matrix, empirical_counts, self.lam)
         w_0 = np.random.random(self.dim)
         optimal_params = fmin_l_bfgs_b(func=calc_objective, fprime=calc_gradient, x0=w_0, args=args,
                                        maxiter=self.maxiter, iprint=iprint)
         self.lbfgs_result = optimal_params
         self.weights = optimal_params[0]
 
-    def fit(self, train_path, use_new):
+    def fit(self, train_path):
         """
         A simple interface to train a model.
         :param train_path: A path for training data, *.wtag format.
         """
         self.train_path = train_path
         self.preprocess()
-        self.optimize(use_new)
+        self.optimize()
 
     def save(self, filename='model_' + strftime("%Y-%m-%d_%H-%M-%S")):
         pkl_path = 'dumps/' + filename + '.pkl'
