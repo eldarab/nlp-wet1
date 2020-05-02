@@ -84,7 +84,7 @@ def calc_expected_counts(v_i, dim, features_matrix):
 #     return (-1) * likelihood, (-1) * grad
 
 
-def calc_objective(v_i, dim, features_list, features_matrix, empirical_counts, reg_lambda, use_new):
+def calc_objective(v_i, dim, features_list, features_matrix, empirical_counts, reg_lambda):
     linear_term = calc_linear_term(v_i, features_list)
     normalization_term = calc_normalization_term(v_i, features_matrix)
     regularization = calc_regularization(v_i, reg_lambda)
@@ -93,7 +93,7 @@ def calc_objective(v_i, dim, features_list, features_matrix, empirical_counts, r
     return -1 * likelihood
 
 
-def calc_gradient(v_i, dim, features_list, features_matrix, empirical_counts, reg_lambda, useNew):
+def calc_gradient(v_i, dim, features_list, features_matrix, empirical_counts, reg_lambda):
     #       Gradient Function
     expected_counts = calc_expected_counts(v_i, dim, features_matrix)
     regularization_grad = reg_lambda * v_i
