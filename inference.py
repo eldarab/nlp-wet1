@@ -7,6 +7,7 @@ def calc_q(feature_ids, weights, all_tags, pword, cword, nword, pptag, ptag, cta
     exp_weights = np.exp(weights)
     history = (cword, pptag, ptag, pword, nword)
     feature_rep = feature_ids.history_feature_representation(history, ctag)
+
     numerator = exp_multiply_sparse(exp_weights, feature_rep)
     denominator = 0
     for tag in all_tags:

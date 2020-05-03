@@ -118,19 +118,6 @@ def nd_history_feature_representation(feature_ids, history, ctag):
     return features_index
 
 
-def calc_features_list(feature_ids, histories_list, ctags_list):
-    return np.array([feature_ids.history_feature_representation(histories_list[i], ctags_list[i])
-                    for i in range(len(histories_list))])
-
-
-def build_features_mat(feature_ids, all_histories_list, all_tags_list):
-    row_dim = len(all_histories_list)
-    col_dim = len(all_tags_list)
-    feature_mat = np.array([[feature_ids.history_feature_representation(all_histories_list[i], all_tags_list[j])
-                            for j in range(col_dim)] for i in range(row_dim)])
-    return feature_mat
-
-
 def sparse_to_dense(sparse_vec, dim):
     dense_vec = np.zeros(dim)
     for entrance in sparse_vec:

@@ -8,7 +8,7 @@ from time import strftime
 from scipy.optimize import fmin_l_bfgs_b
 from inference import memm_viterbi
 from preprocessing import FeatureStatisticsClass, Feature2Id
-from auxiliary_functions import get_all_histories_ctags, calc_features_list, build_features_mat, get_file_tags, \
+from auxiliary_functions import get_all_histories_ctags, get_file_tags, \
     get_predictions_list, clean_tags
 from optimization import calc_empirical_counts, calc_objective, calc_gradient
 from numpy.linalg import norm
@@ -57,8 +57,8 @@ class Log_Linear_MEMM:
         # initializing parameters for fmin_l_bfgs_b
         all_tags_list = self.feature2id.get_all_tags()
         all_histories, all_corresponding_tags = get_all_histories_ctags(self.train_path)  # abuse of notation :)
-        features_list = calc_features_list(self.feature2id, all_histories, all_corresponding_tags)
-        features_matrix = build_features_mat(self.feature2id, all_histories, all_tags_list)
+        features_list = self.feature2id.calc_features_list(all_histories, all_corresponding_tags)
+        features_matrix = self.feature2id.build_features_mat(all_histories, all_tags_list)
         empirical_counts = calc_empirical_counts(features_list, self.dim)
         args = (self.dim, features_list, features_matrix, empirical_counts, self.lam, use_new)
         w_0 = np.random.random(self.dim)
