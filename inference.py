@@ -1,15 +1,17 @@
 from math import exp
-from auxiliary_functions import multiply_sparse, BEGIN, STOP, get_words_arr
+from auxiliary_functions import multiply_sparse, BEGIN, STOP, get_words_arr, exp_multiply_sparse
+import numpy as np
 
 
 def calc_q(feature_ids, weights, all_tags, pword, cword, nword, pptag, ptag, ctag):
+    exp_weights = np.exp(weights)
     history = (cword, pptag, ptag, pword, nword)
     feature_rep = feature_ids.history_feature_representation(history, ctag)
     numerator = exp(multiply_sparse(weights, feature_rep))
     denominator = 0
     for tag in all_tags:
         feature_rep = feature_ids.history_feature_representation(history, tag)
-        denominator += exp(multiply_sparse(weights, feature_rep))
+        denominator += (exp_multiply_sparse(exp_weights, feature_rep))
 
     return numerator / denominator
 
