@@ -56,26 +56,6 @@ def memm_viterbi(feature_ids, weights, sentence, beam_size):
         cword = nword
         nword = words_arr[k + 1]
 
-        # beam_list = []
-        # for v in all_tags:
-        #     v_prob = 0
-        #     for u in tags_dict[k-1]:
-        #         pi[k][u, v] = 0
-        #         for t in tags_dict[k-2]:
-        #             if pi[k-1][t, u] == 0:
-        #                 continue
-        #             history = (cword, t, u, pword, nword)
-        #             q_denominator = calc_q_denominator(feature_ids, weights, all_tags, history)
-        #             q = calc_q(feature_ids, weights, history, v, q_denominator)
-        #             if pi[k-1][t, u] * q > pi[k][u, v]:
-        #                 pi[k][u, v] = pi[k-1][t, u] * q
-        #                 bp[k][u, v] = t
-        #         v_prob += pi[k][u, v]
-        #     beam_list.append((v, v_prob))
-        # beam_list.sort(reverse=True, key=lambda item: item[1])
-        # if beam_size != 0:
-        #     tags_dict[k] = [beam_list[i][0] for i in range(beam_size)]
-
         pi[k] = dict.fromkeys([(u, v) for u in tags_dict[k-1] for v in all_tags], 0)
         for u in tags_dict[k-1]:
             for t in tags_dict[k-2]:
@@ -96,6 +76,7 @@ def memm_viterbi(feature_ids, weights, sentence, beam_size):
             v_probability = 0
             for u in tags_dict[k-1]:
                 v_probability += pi[k][u, v]
+            beam_list.append((v, v_probability))
         beam_list.sort(reverse=True, key=lambda item: item[1])
         tags_dict[k] = [beam_list[i][0] for i in range(beam_size)]
 

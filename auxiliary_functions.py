@@ -1,5 +1,4 @@
 import numpy as np
-import pickle
 
 BEGIN = '*B'
 STOP = '*S'
@@ -191,11 +190,6 @@ def clean_tags(input_data, file_name=None):
                     word = word_tag.split('_')[0]
                     out_file.write(word + ' ')
                 out_file.write('\n')
-
-
-def load_model(filepath):
-    with open(filepath, 'rb') as f:
-        return pickle.load(f)
 
 
 def get_predictions_list(predictions):

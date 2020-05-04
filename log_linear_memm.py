@@ -218,3 +218,8 @@ class Log_Linear_MEMM:
         with open(file=file_name, mode='w') as predictions_file:
             predictions_file.write('\n'.join(' '.join([word + '_' + tag for word, tag in sentence_prediction])
                                              for sentence_prediction in predictions))
+
+    @staticmethod
+    def load_model(filepath):
+        with open(filepath, 'rb') as f:
+            return pickle.load(f)
