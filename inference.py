@@ -3,18 +3,36 @@ import numpy as np
 from auxiliary_functions import BEGIN, STOP, get_words_arr, exp_multiply_sparse
 
 
-def calc_q(feature_ids, weights, all_tags, pword, cword, nword, pptag, ptag, ctag):
+def calc_q(feature_ids, weights, history, ctag, denominator):
+    """
+    :param feature_ids: Feature2Id object
+    :param weights: The weights of the Log_Linear_Memm
+    :param history: Current history, presented in the following format: (cword, pptag, ptag, pword, nword)
+    :param ctag: Current tag
+    :param denominator: The denominator for the given history
+    :return: q for a given history and tag
+    """
     exp_weights = np.exp(weights)
-    history = (cword, pptag, ptag, pword, nword)
     feature_rep = feature_ids.history_feature_representation(history, ctag)
-
     numerator = exp_multiply_sparse(exp_weights, feature_rep)
+    return numerator / denominator
+
+
+def calc_q_denominator(feature_ids, weights, all_tags, history):
+    """
+    :param feature_ids: Feature2Id object
+    :param weights: The weight of the Log_Linear_Memm
+    :param all_tags: All of the tags featured in the learning data
+    :param history: A certain history, presented in the following format: (cword, pptag, ptag, pword, nword)
+    :return: The denominator of function calc_q for a certain history
+    """
+    exp_weights = np.exp(weights)
     denominator = 0
     for tag in all_tags:
         feature_rep = feature_ids.history_feature_representation(history, tag)
         denominator += (exp_multiply_sparse(exp_weights, feature_rep))
 
-    return numerator / denominator
+    return denominator
 
 
 def memm_viterbi(feature_ids, weights, sentence, beam_size):
@@ -38,24 +56,48 @@ def memm_viterbi(feature_ids, weights, sentence, beam_size):
         cword = nword
         nword = words_arr[k + 1]
 
-        beam_list = []
-        for v in all_tags:
-            v_prob = 0
-            for u in tags_dict[k-1]:
-                pi[k][u, v] = 0
-                for t in tags_dict[k-2]:
-                    if pi[k-1][t, u] == 0:
-                        continue
+        # beam_list = []
+        # for v in all_tags:
+        #     v_prob = 0
+        #     for u in tags_dict[k-1]:
+        #         pi[k][u, v] = 0
+        #         for t in tags_dict[k-2]:
+        #             if pi[k-1][t, u] == 0:
+        #                 continue
+        #             history = (cword, t, u, pword, nword)
+        #             q_denominator = calc_q_denominator(feature_ids, weights, all_tags, history)
+        #             q = calc_q(feature_ids, weights, history, v, q_denominator)
+        #             if pi[k-1][t, u] * q > pi[k][u, v]:
+        #                 pi[k][u, v] = pi[k-1][t, u] * q
+        #                 bp[k][u, v] = t
+        #         v_prob += pi[k][u, v]
+        #     beam_list.append((v, v_prob))
+        # beam_list.sort(reverse=True, key=lambda item: item[1])
+        # if beam_size != 0:
+        #     tags_dict[k] = [beam_list[i][0] for i in range(beam_size)]
 
-                    q = calc_q(feature_ids, weights, all_tags, pword, cword, nword, t, u, v)
+        pi[k] = dict.fromkeys([(u, v) for u in tags_dict[k-1] for v in all_tags], 0)
+        for u in tags_dict[k-1]:
+            for t in tags_dict[k-2]:
+                if pi[k-1][t, u] == 0:
+                    continue
+                history = (cword, t, u, pword, nword)
+                q_denominator = calc_q_denominator(feature_ids, weights, all_tags, history)
+                for v in all_tags:
+                    q = calc_q(feature_ids, weights, history, v, q_denominator)
                     if pi[k-1][t, u] * q > pi[k][u, v]:
                         pi[k][u, v] = pi[k-1][t, u] * q
                         bp[k][u, v] = t
-                v_prob += pi[k][u, v]
-            beam_list.append((v, v_prob))
+
+        if beam_size == 0:
+            continue
+        beam_list = []
+        for v in all_tags:
+            v_probability = 0
+            for u in tags_dict[k-1]:
+                v_probability += pi[k][u, v]
         beam_list.sort(reverse=True, key=lambda item: item[1])
-        if beam_size != 0:
-            tags_dict[k] = [beam_list[i][0] for i in range(beam_size)]
+        tags_dict[k] = [beam_list[i][0] for i in range(beam_size)]
 
     tag_sequence = [None for i in range(n + 1)]
     max_prob = 0
