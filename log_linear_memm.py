@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 from os import remove
-from time import strftime
+from time import strftime, time
 from scipy.optimize import fmin_l_bfgs_b
 from inference import memm_viterbi
 from preprocessing import FeatureStatisticsClass, Feature2Id
@@ -40,6 +40,7 @@ class Log_Linear_MEMM:
         self.f108 = f108
         self.f109 = f109
         self.f110 = f110
+        self.fit_time = None
 
     def __sub__(self, other):
         return self.weights @ other.weights / (norm(self.weights) * norm(other.weights))
@@ -72,9 +73,11 @@ class Log_Linear_MEMM:
         A simple interface to train a model.
         :param train_path: A path for training data, *.wtag format.
         """
+        start_time = time()
         self.train_path = train_path
         self.preprocess()
         self.optimize(use_new, iprint)
+        self.fit_time = time() - start_time
         return self
 
     def save(self, filename='model_' + strftime("%Y-%m-%d_%H-%M-%S")):
@@ -89,6 +92,8 @@ class Log_Linear_MEMM:
             f.write('threshold = ' + str(self.threshold) + '\n')
             f.write('fix_threshold = ' + str(self.fix_threshold) +
                     (' has no meaning' if not self.f101 and not self.f102 else '') + '\n')
+            # TODO log time in a more readable way
+            f.write('fit time= ' + str(round(self.fit_time, 2)) + ' sec\n')
             f.write('lam = ' + str(self.lam) + '\n')
             f.write('maxiter = ' + str(self.maxiter) + '\n')
             f.write('f100 = ' + str(self.f100) + '\n')
