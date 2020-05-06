@@ -71,49 +71,16 @@ def calc_expected_counts_new(v_i, dim, features_matrix):
             temp = exp_multiply_sparse(exp_v_i, feature)
             denominator += temp
             for f in feature:
-                # add_or_append(index_weights, f, size=temp)
                 numerator[f] += temp
-        # expected_counts += sparse_dict_to_dense(index_weights, dim) / denominator
         expected_counts += numerator / denominator
     return expected_counts
-
-# def calc_objective_and_grad(v_i, dim, features_list, features_matrix, empirical_counts, reg_lambda):
-#     """
-#     Generates objective and gradient to use in fmin_l_bfgs_b in a single iteration
-#     :param v_i: [[DENSE]] Parameter to optimize at iteration i
-#     :param dim: [[SCALAR]] the dimension of the space we optimize in
-#     :param features_list: [[SPARSE]] A list of the sparse feature representation of all histories in corpus, i.e. f(xi,yi)
-#     :param features_matrix: [[SPARSE]] A matrix containing sparse feature representation of all histories combined with
-#     all tags in corpus, i.e. f(xi,y') for each y' in tags
-#     :param empirical_counts: [[DENSE]] A dense representation of empirical_counts
-#     :param expected_counts_vec: [[DENSE]] A dense representation of expected_counts numerator, without p(y'|x;v) scalar
-#     :param reg_lambda: [[SCALAR]] Hyper-parameter that controls regularization
-#     :return: A tuple of the likelihood (objective) and it's gradient to pass to fmin_l_bfgs_b
-#     """
-#     #       Objective Function
-#     # calculating linear term
-#     linear_term = calc_linear_term(v_i, features_list)
-#
-#     # feat_mat is a np array of all of the features from the train data
-#     # linear_term = np.sum(v_i @ feat_mat)
-#
-#     normalization_term = calc_normalization_term(v_i, features_matrix)
-#     regularization = calc_regularization(v_i, reg_lambda)  # l2 norm
-#
-#     #       Gradient Function
-#     expected_counts = calc_expected_counts(v_i, dim, features_matrix)
-#     regularization_grad = reg_lambda * v_i
-#
-#     likelihood = linear_term - normalization_term - regularization
-#     grad = empirical_counts - expected_counts - regularization_grad
-#
-#     return (-1) * likelihood, (-1) * grad
 
 
 def calc_objective(v_i, dim, features_list, features_matrix, empirical_counts, reg_lambda, use_new):
     linear_term = calc_linear_term(v_i, features_list)
-    normalization_term = calc_normalization_term_new(v_i, features_matrix) if use_new \
-        else calc_normalization_term_old(v_i, features_matrix)
+    # normalization_term = calc_normalization_term_new(v_i, features_matrix) if use_new \
+    #     else calc_normalization_term_old(v_i, features_matrix)
+    normalization_term = calc_normalization_term_new(v_i, features_matrix)
 
     regularization = calc_regularization(v_i, reg_lambda)
 
@@ -122,8 +89,9 @@ def calc_objective(v_i, dim, features_list, features_matrix, empirical_counts, r
 
 
 def calc_gradient(v_i, dim, features_list, features_matrix, empirical_counts, reg_lambda, use_new):
-    expected_counts = calc_expected_counts_new(v_i, dim, features_matrix) if use_new \
-        else calc_expected_counts_old(v_i, dim, features_matrix)
+    # expected_counts = calc_expected_counts_new(v_i, dim, features_matrix) if use_new \
+    #     else calc_expected_counts_old(v_i, dim, features_matrix)
+    expected_counts = calc_expected_counts_new(v_i, dim, features_matrix)
 
     regularization_grad = reg_lambda * v_i
 

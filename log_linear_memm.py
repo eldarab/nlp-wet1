@@ -75,6 +75,7 @@ class Log_Linear_MEMM:
         self.train_path = train_path
         self.preprocess()
         self.optimize(use_new, iprint)
+        return self
 
     def save(self, filename='model_' + strftime("%Y-%m-%d_%H-%M-%S")):
         pkl_path = 'dumps/' + filename + '.pkl'
