@@ -8,25 +8,31 @@ from time import strftime, time
 from scipy.optimize import fmin_l_bfgs_b
 from inference import memm_viterbi
 from preprocessing import FeatureStatisticsClass, Feature2Id
-from auxiliary_functions import get_all_histories_ctags, get_file_tags, \
+from auxiliary_functions import get_all_histories_and_corresponding_tags, get_file_tags, \
     get_predictions_list, clean_tags
 from optimization import calc_empirical_counts, calc_objective, calc_gradient
 from numpy.linalg import norm
+
+# TODO delete tqdm
+from tqdm import tqdm
 
 sns.set()
 
 
 class Log_Linear_MEMM:
-    def __init__(self, threshold=10, fix_threshold=50, lam=0, maxiter=200, f100=True, f101=True, f102=True, f103=True,
-                 f104=True, f105=True, f106=True, f107=True, f108=True, f109=True, f110=True):
+    def __init__(self, threshold=10, fix_threshold=-1, lam=0, maxiter=200, fix_weights=(0.5, 0.7, 1, 1),
+                 f100=True, f101=True, f102=True, f103=True, f104=True, f105=True,
+                 f106=True, f107=True, f108=True, f109=True, f110=True):
         self.train_path = None
-        self.feature_statistics = None
-        self.feature2id = None
+        self.feature_statistics: FeatureStatisticsClass = None
+        self.feature2id: Feature2Id = None
         self.weights = None
         self.lbfgs_result = None
         self.dim = None
         self.threshold = threshold
+        # TODO compare fix_threshold performance to fix_weights
         self.fix_threshold = fix_threshold if fix_threshold >= 0 else threshold
+        self.fix_weights = fix_weights
         self.lam = lam
         self.maxiter = maxiter
         self.f100 = f100
@@ -45,8 +51,23 @@ class Log_Linear_MEMM:
     def __sub__(self, other):
         return self.weights @ other.weights / (norm(self.weights) * norm(other.weights))
 
-    def preprocess(self):
-        self.feature_statistics = FeatureStatisticsClass(self.train_path)
+    # TODO delete use_new
+    def fit(self, train_path, use_new=True, iprint=20):
+        """
+        A simple interface to train a model.
+        :param train_path: A path for training data, *.wtag format.
+        :param iprint: A parameter of fmin_l_bfgs_b, effects how often it prints
+        :param fix_weights: A parameter of FeatureStatisticsClass
+        """
+        start_time = time()
+        self.train_path = train_path
+        self.__preprocess(self.fix_weights)
+        self.__optimize(use_new, iprint)
+        self.fit_time = time() - start_time
+        return self
+
+    def __preprocess(self, fix_weights):
+        self.feature_statistics = FeatureStatisticsClass(self.train_path, fix_weights)
         self.feature_statistics.count_features(self.f100, self.f101, self.f102, self.f103, self.f104, self.f105,
                                                self.f106, self.f107, self.f108, self.f109, self.f110)
         self.feature2id = Feature2Id(self.train_path, self.feature_statistics, self.threshold, self.fix_threshold)
@@ -54,10 +75,10 @@ class Log_Linear_MEMM:
                                                self.f106, self.f107, self.f108, self.f109, self.f110)
         self.dim = self.feature2id.total_features
 
-    def optimize(self, use_new, iprint):
+    def __optimize(self, use_new, iprint):
         # initializing parameters for fmin_l_bfgs_b
         all_tags_list = self.feature2id.get_all_tags()
-        all_histories, all_corresponding_tags = get_all_histories_ctags(self.train_path)  # abuse of notation :)
+        all_histories, all_corresponding_tags = get_all_histories_and_corresponding_tags(self.train_path)
         features_list = self.feature2id.calc_features_list(all_histories, all_corresponding_tags)
         features_matrix = self.feature2id.build_features_mat(all_histories, all_tags_list)
         empirical_counts = calc_empirical_counts(features_list, self.dim)
@@ -67,18 +88,6 @@ class Log_Linear_MEMM:
                                        maxiter=self.maxiter, iprint=iprint)
         self.lbfgs_result = optimal_params
         self.weights = optimal_params[0]
-
-    def fit(self, train_path, use_new=True, iprint=20):
-        """
-        A simple interface to train a model.
-        :param train_path: A path for training data, *.wtag format.
-        """
-        start_time = time()
-        self.train_path = train_path
-        self.preprocess()
-        self.optimize(use_new, iprint)
-        self.fit_time = time() - start_time
-        return self
 
     def save(self, filename='model_' + strftime("%Y-%m-%d_%H-%M-%S")):
         pkl_path = 'dumps/' + filename + '.pkl'
@@ -132,7 +141,7 @@ class Log_Linear_MEMM:
     def __predict_file(self, file, beam_size):
         with open(file, 'r') as in_file:
             predictions = []
-            for line in in_file:
+            for line in tqdm(in_file):
                 line_predictions = []
                 words = line.split()
                 prediction = memm_viterbi(self.feature2id, self.weights, line, beam_size)

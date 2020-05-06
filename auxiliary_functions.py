@@ -79,44 +79,6 @@ def has_hyphen(word):
             return True
 
 
-# This function does the same thing as the function above, only it returns a dense numpy array
-def nd_history_feature_representation(feature_ids, history, ctag):
-    pword, cword, nword = history[4].lower(), history[0].lower(), history[3].lower()
-    pptag, ptag = history[1], history[2]
-    features_index = np.zeros(feature_ids.total_features)
-
-    if (cword, ctag) in feature_ids.f100_index_dict:
-        features_index[feature_ids.f100_index_dict[(cword, ctag)]] = 1
-
-    for n in range(1, 5):
-        if len(cword) <= n:
-            break
-        if (cword[:n], ctag) in feature_ids.f101_index_dict:
-            features_index[feature_ids.f101_index_dict[(cword[:n], ctag)]] = 1
-        if (cword[-n:], ctag) in feature_ids.f102_index_dict:
-            features_index[feature_ids.f102_index_dict[(cword[-n:], ctag)]] = 1
-
-    if (pptag, ptag, ctag) in feature_ids.f103_index_dict:
-        features_index[feature_ids.f103_index_dict[(pptag, ptag, ctag)]] = 1
-
-    if (ptag, ctag) in feature_ids.f104_index_dict:
-        features_index[feature_ids.f104_index_dict[(ptag, ctag)]] = 1
-
-    if ctag in feature_ids.f105_index_dict:
-        features_index[feature_ids.f105_index_dict[ctag]] = 1
-
-    if has_digit(cword) and (CONTAINS_DIGIT, ctag) in feature_ids.f108_index_dict:
-        features_index[feature_ids.f108_index_dict[(CONTAINS_DIGIT, ctag)]] = 1
-
-    if has_upper(cword) and (CONTAINS_UPPER, ctag) in feature_ids.f109_index_dict:
-        features_index[feature_ids.f109_index_dict[(CONTAINS_UPPER, ctag)]] = 1
-
-    if has_hyphen(cword) and (CONTAINS_HYPHEN, ctag) in feature_ids.f110_index_dict:
-        features_index[feature_ids.f110_index_dict[(CONTAINS_HYPHEN, ctag)]] = 1
-
-    return features_index
-
-
 def sparse_to_dense(sparse_vec, dim):
     dense_vec = np.zeros(dim)
     for entrance in sparse_vec:
@@ -124,6 +86,7 @@ def sparse_to_dense(sparse_vec, dim):
     return dense_vec
 
 
+# TODO check usages
 def sparse_dict_to_dense(sparse_dict, dim):
     dense_vec = np.zeros(dim)
     for entrance in sparse_dict:
@@ -131,7 +94,7 @@ def sparse_dict_to_dense(sparse_dict, dim):
     return dense_vec
 
 
-def get_all_histories_ctags(file_path):
+def get_all_histories_and_corresponding_tags(file_path):
     with open(file_path) as f:
         all_histories = []
         all_ctags = []

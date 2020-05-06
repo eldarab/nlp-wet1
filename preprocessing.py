@@ -5,8 +5,13 @@ import numpy as np
 
 
 class FeatureStatisticsClass:
-    def __init__(self, file_path):
+    def __init__(self, file_path, fix_weights):
+        """
+        :param file_path: The path of the train file
+        :param fix_weights: The weight given to suffix or prefix when counted based on its size
+        """
         self.file_path = file_path
+        self.fix_weights = fix_weights
         self.f100_count_dict = OrderedDict()  # Init all features dictionaries
         self.f101_count_dict = OrderedDict()  # Prefix features
         self.f102_count_dict = OrderedDict()  # Suffix features
@@ -61,7 +66,7 @@ class FeatureStatisticsClass:
                     for n in range(1, 5):
                         if len(cword) <= n:
                             break
-                        add_or_append(self.f101_count_dict, (cword[:n], ctag))
+                        add_or_append(self.f101_count_dict, (cword[:n], ctag), size=self.fix_weights(n))
 
     def count_f102(self):
         with open(self.file_path) as f:
@@ -72,7 +77,7 @@ class FeatureStatisticsClass:
                     for n in range(1, 5):
                         if len(cword) <= n:
                             break
-                        add_or_append(self.f102_count_dict, (cword[-n:], ctag))
+                        add_or_append(self.f102_count_dict, (cword[-n:], ctag), size=self.fix_weights(n))
 
     def count_f103(self):
         with open(self.file_path) as f:
@@ -158,9 +163,16 @@ class FeatureStatisticsClass:
 
 class Feature2Id:
     def __init__(self, file_path, feature_statistics, threshold, fix_threshold):
+        """
+        :param file_path: The path of the train data
+        :param feature_statistics: statistics class, for each feature gives empirical counts
+        :param threshold: feature count threshold - empirical count must be higher than this in order for a certain
+        feature to be kept
+        """
         self.file_path = file_path
-        self.feature_statistics = feature_statistics  # statistics class, for each feature gives empirical counts
+        self.feature_statistics: FeatureStatisticsClass = feature_statistics
         self.threshold = threshold  # feature count threshold - empirical count must be higher than this
+        # TODO crosscheck fix_threshold against fix_weights
         self.fix_threshold = fix_threshold  # feature count threshold for prefix and suffix features
         self.total_features = 0  # Total number of features accumulated
         # Internal feature indexing
@@ -271,7 +283,7 @@ class Feature2Id:
                             break
                         prefix = cword[:n]
                         if (prefix, ctag) not in self.f101_index_dict \
-                                and self.feature_statistics.f101_count_dict[(prefix, ctag)] >= self.threshold:
+                                and self.feature_statistics.f101_count_dict[(prefix, ctag)] >= self.fix_threshold:
                             self.f101_index_dict[(prefix, ctag)] = self.f101_counter + self.total_features
                             self.f101_counter += 1
         self.total_features += self.f101_counter
@@ -304,7 +316,7 @@ class Feature2Id:
                     ptag = ctag
                     ctag = word_tag.split('_')[1]
                     if (pptag, ptag, ctag) not in self.f103_index_dict \
-                            and self.feature_statistics.f103_count_dict[(pptag, ptag, ctag)] >= self.fix_threshold:
+                            and self.feature_statistics.f103_count_dict[(pptag, ptag, ctag)] >= self.threshold:
                         self.f103_index_dict[(pptag, ptag, ctag)] = self.f103_counter + self.total_features
                         self.f103_counter += 1
         self.total_features += self.f103_counter

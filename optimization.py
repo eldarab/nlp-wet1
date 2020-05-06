@@ -1,10 +1,9 @@
-import numpy as np
-from auxiliary_functions import multiply_sparse, exp_multiply_sparse, sparse_dict_to_dense, sparse_to_dense, \
-    add_or_append
 from math import exp, log
+
+import numpy as np
 from numpy.linalg import norm
 
-from concurrent.futures import ThreadPoolExecutor
+from auxiliary_functions import multiply_sparse, exp_multiply_sparse, sparse_to_dense
 
 
 def calc_empirical_counts(features_list, dim):
