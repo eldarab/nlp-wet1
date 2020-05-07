@@ -5,8 +5,13 @@ import numpy as np
 
 
 class FeatureStatisticsClass:
-    def __init__(self, file_path):
+    def __init__(self, file_path, fix_weights):
+        """
+        :param file_path: The path of the train file
+        :param fix_weights: The weight given to suffix or prefix when counted based on its size
+        """
         self.file_path = file_path
+        self.fix_weights = fix_weights
         self.f100_count_dict = OrderedDict()  # Init all features dictionaries
         self.f101_count_dict = OrderedDict()  # Prefix features
         self.f102_count_dict = OrderedDict()  # Suffix features
@@ -61,7 +66,7 @@ class FeatureStatisticsClass:
                     for n in range(1, 5):
                         if len(cword) <= n:
                             break
-                        add_or_append(self.f101_count_dict, (cword[:n], ctag))
+                        add_or_append(self.f101_count_dict, (cword[:n], ctag), size=self.fix_weights[n-1])
 
     def count_f102(self):
         with open(self.file_path) as f:
@@ -72,7 +77,7 @@ class FeatureStatisticsClass:
                     for n in range(1, 5):
                         if len(cword) <= n:
                             break
-                        add_or_append(self.f102_count_dict, (cword[-n:], ctag))
+                        add_or_append(self.f102_count_dict, (cword[-n:], ctag), size=self.fix_weights[n-1])
 
     def count_f103(self):
         with open(self.file_path) as f:
@@ -158,9 +163,16 @@ class FeatureStatisticsClass:
 
 class Feature2Id:
     def __init__(self, file_path, feature_statistics, threshold, fix_threshold):
+        """
+        :param file_path: The path of the train data
+        :param feature_statistics: statistics class, for each feature gives empirical counts
+        :param threshold: feature count threshold - empirical count must be higher than this in order for a certain
+        feature to be kept
+        """
         self.file_path = file_path
-        self.feature_statistics = feature_statistics  # statistics class, for each feature gives empirical counts
+        self.feature_statistics: FeatureStatisticsClass = feature_statistics
         self.threshold = threshold  # feature count threshold - empirical count must be higher than this
+        # TODO crosscheck fix_threshold against fix_weights
         self.fix_threshold = fix_threshold  # feature count threshold for prefix and suffix features
         self.total_features = 0  # Total number of features accumulated
         # Internal feature indexing
@@ -259,7 +271,7 @@ class Feature2Id:
                         self.f100_counter += 1
         self.total_features += self.f100_counter
 
-    # TODO weight this feature
+    # TODO weigh this feature according to prefix size
     def initialize_f101_index_dict(self):
         with open(self.file_path) as f:
             for line in f:
@@ -271,12 +283,12 @@ class Feature2Id:
                             break
                         prefix = cword[:n]
                         if (prefix, ctag) not in self.f101_index_dict \
-                                and self.feature_statistics.f101_count_dict[(prefix, ctag)] >= self.threshold:
+                                and self.feature_statistics.f101_count_dict[(prefix, ctag)] >= self.fix_threshold:
                             self.f101_index_dict[(prefix, ctag)] = self.f101_counter + self.total_features
                             self.f101_counter += 1
         self.total_features += self.f101_counter
 
-    # TODO weight this feature
+    # TODO weigh this feature according to suffix size
     def initialize_f102_index_dict(self):
         with open(self.file_path) as f:
             for line in f:
@@ -304,7 +316,7 @@ class Feature2Id:
                     ptag = ctag
                     ctag = word_tag.split('_')[1]
                     if (pptag, ptag, ctag) not in self.f103_index_dict \
-                            and self.feature_statistics.f103_count_dict[(pptag, ptag, ctag)] >= self.fix_threshold:
+                            and self.feature_statistics.f103_count_dict[(pptag, ptag, ctag)] >= self.threshold:
                         self.f103_index_dict[(pptag, ptag, ctag)] = self.f103_counter + self.total_features
                         self.f103_counter += 1
         self.total_features += self.f103_counter
@@ -407,7 +419,7 @@ class Feature2Id:
                             self.f110_counter += 1
         self.total_features += self.f110_counter
 
-    def history_feature_representation(self, history, ctag):
+    def sparse_feature_representation(self, history, ctag):
         pword, cword, nword = history[4].lower(), history[0].lower(), history[3].lower()
         pptag, ptag = history[1], history[2]
         features = []
@@ -448,4 +460,68 @@ class Feature2Id:
             features.append(self.f110_index_dict[(CONTAINS_HYPHEN, ctag)])
 
         return np.array(features)
+
+    def dense_feature_representation(self, history, ctag):
+        pword, cword, nword = history[4].lower(), history[0].lower(), history[3].lower()
+        pptag, ptag = history[1], history[2]
+        features = np.zeros(self.total_features)
+
+        if (cword, ctag) in self.f100_index_dict:
+            features[self.f100_index_dict[(cword, ctag)]] += 1
+
+        for n in range(1, 5):
+            if len(cword) <= n:
+                break
+            if (cword[:n], ctag) in self.f101_index_dict:
+                features[self.f101_index_dict[(cword[:n], ctag)]] += 1
+            if (cword[-n:], ctag) in self.f102_index_dict:
+                features[self.f102_index_dict[(cword[-n:], ctag)]] += 1
+
+        if (pptag, ptag, ctag) in self.f103_index_dict:
+            features[self.f103_index_dict[(pptag, ptag, ctag)]] += 1
+
+        if (ptag, ctag) in self.f104_index_dict:
+            features[self.f104_index_dict[(ptag, ctag)]] += 1
+
+        if ctag in self.f105_index_dict:
+            features[self.f105_index_dict[ctag]] += 1
+
+        if (pword, ctag) in self.f106_index_dict:
+            features[self.f106_index_dict[(pword, ctag)]] += 1
+
+        if (nword, ctag) in self.f107_index_dict:
+            features[self.f107_index_dict[(nword, ctag)]] += 1
+
+        if has_digit(cword) and (CONTAINS_DIGIT, ctag) in self.f108_index_dict:
+            features[self.f108_index_dict[(CONTAINS_DIGIT, ctag)]] += 1
+
+        if has_upper(cword) and (CONTAINS_UPPER, ctag) in self.f109_index_dict:
+            features[self.f109_index_dict[(CONTAINS_UPPER, ctag)]] += 1
+
+        if has_hyphen(cword) and (CONTAINS_HYPHEN, ctag) in self.f110_index_dict:
+            features[self.f110_index_dict[(CONTAINS_HYPHEN, ctag)]] += 1
+
+        return features
+
+    def build_features_list(self, histories_list, corresponding_tags_list):
+        row_dim = len(histories_list)
+        # res = np.empty((row_dim, self.total_features))
+        # for i in range(row_dim):
+        #     res = self.dense_feature_representation(histories_list[i], corresponding_tags_list[i], dim)
+
+        res = [self.sparse_feature_representation(histories_list[i], corresponding_tags_list[i])
+               for i in range(row_dim)]
+        return res
+
+    def build_features_matrix(self, all_histories_list, all_tags_list):
+        row_dim = len(all_histories_list)
+        col_dim = len(all_tags_list)
+        # feature_matrix = np.empty(shape=(row_dim, col_dim, dim))
+        # for i in range(row_dim):
+        #     for j in range(col_dim):
+        #         feature_matrix[i, j] = self.dense_feature_representation(all_histories_list[i], all_tags_list[j], dim)
+
+        feature_matrix = [[self.sparse_feature_representation(all_histories_list[i], all_tags_list[j])
+                           for j in range(col_dim)] for i in range(row_dim)]
+        return feature_matrix
 
