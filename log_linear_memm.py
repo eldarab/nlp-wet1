@@ -33,8 +33,11 @@ class Log_Linear_MEMM:
         # TODO compare fix_threshold performance to fix_weights
         self.fix_threshold = fix_threshold if fix_threshold >= 0 else threshold
         self.fix_weights = fix_weights
+        self.fit_time = None
         self.lam = lam
+        # TODO may cause problems to load previous models
         self.maxiter = maxiter
+        self.iter = None  # will be set AFTER optimization finished and holds the number of iterations de-facto
         self.f100 = f100
         self.f101 = f101
         self.f102 = f102
@@ -46,7 +49,6 @@ class Log_Linear_MEMM:
         self.f108 = f108
         self.f109 = f109
         self.f110 = f110
-        self.fit_time = None
 
     def __sub__(self, other):
         return self.weights @ other.weights / (norm(self.weights) * norm(other.weights))
@@ -75,7 +77,7 @@ class Log_Linear_MEMM:
                                                self.f106, self.f107, self.f108, self.f109, self.f110)
         self.dim = self.feature2id.total_features
 
-    def __optimize(self, use_new, iprint):
+    def __optimize(self, use_new, iprint=20):
         # initializing parameters for fmin_l_bfgs_b
         all_tags_list = self.feature2id.get_all_tags()
         all_histories, all_corresponding_tags = get_all_histories_and_corresponding_tags(self.train_path)
@@ -87,6 +89,7 @@ class Log_Linear_MEMM:
         optimal_params = fmin_l_bfgs_b(func=calc_objective, fprime=calc_gradient, x0=w_0, args=args,
                                        maxiter=self.maxiter, iprint=iprint)
         self.lbfgs_result = optimal_params
+        self.iter = optimal_params[2]['nit']
         self.weights = optimal_params[0]
 
     def save(self, filename='model_' + strftime("%Y-%m-%d_%H-%M-%S")):
@@ -102,9 +105,11 @@ class Log_Linear_MEMM:
             f.write('fix_threshold = ' + str(self.fix_threshold) +
                     (' has no meaning' if not self.f101 and not self.f102 else '') + '\n')
             # TODO log time in a more readable way
-            f.write('fit time= ' + str(round(self.fit_time, 2)) + ' sec\n')
+            f.write('fix_weights = ' + str(self.fix_weights) + '\n')
+            f.write('fit time = ' + str(round(self.fit_time, 2)) + ' sec\n')
             f.write('lam = ' + str(self.lam) + '\n')
             f.write('maxiter = ' + str(self.maxiter) + '\n')
+            f.write('iter = ' + str(self.iter) + '\n')
             f.write('f100 = ' + str(self.f100) + '\n')
             f.write('f101 = ' + str(self.f101) + '\n')
             f.write('f102 = ' + str(self.f102) + '\n')
@@ -167,7 +172,7 @@ class Log_Linear_MEMM:
         return correct / total_predictions
 
     @staticmethod
-    def confusion_matrix(test_path, predictions, errors_to_display=10, show=True, order='freq', slice_on_pred=True):
+    def confusion_matrix(test_path, predictions, errors_to_display=10, show=True, order='freq', slice_on_pred=False):
         """
         :param test_path: Path to a *.wtag file with some ground truth
         :param predictions: Predictions matrix that Log_Linear_MEMM.predict() returned on the same test_path
@@ -228,7 +233,7 @@ class Log_Linear_MEMM:
 
     @staticmethod
     def create_predictions_file(predictions,
-                                file_name=r'predictions/prediction_' + strftime("%Y-%m-%d_%H-%M-%S") + '.txt'):
+                                file_name=r'predictions/prediction_' + strftime("%Y-%m-%d_%H-%M-%S") + '.wtag'):
         with open(file=file_name, mode='w') as predictions_file:
             predictions_file.write('\n'.join(' '.join([word + '_' + tag for word, tag in sentence_prediction])
                                              for sentence_prediction in predictions))
