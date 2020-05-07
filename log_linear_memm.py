@@ -79,7 +79,7 @@ class Log_Linear_MEMM:
         # initializing parameters for fmin_l_bfgs_b
         all_tags_list = self.feature2id.get_all_tags()
         all_histories, all_corresponding_tags = get_all_histories_and_corresponding_tags(self.train_path)
-        features_list = self.feature2id.calc_features_list(all_histories, all_corresponding_tags)
+        features_list = self.feature2id.build_features_list(all_histories, all_corresponding_tags)
         features_matrix = self.feature2id.build_features_mat(all_histories, all_tags_list)
         empirical_counts = calc_empirical_counts(features_list, self.dim)
         args = (self.dim, features_list, features_matrix, empirical_counts, self.lam, use_new)
