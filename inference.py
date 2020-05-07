@@ -30,7 +30,7 @@ def calc_q_denominator(feature_ids, weights, all_tags, history):
     denominator = 0
     for tag in all_tags:
         feature_rep = feature_ids.history_feature_representation(history, tag)
-        denominator += (exp_multiply_sparse(exp_weights, feature_rep))
+        denominator += exp_multiply_sparse(exp_weights, feature_rep)
 
     return denominator
 

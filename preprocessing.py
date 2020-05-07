@@ -66,7 +66,7 @@ class FeatureStatisticsClass:
                     for n in range(1, 5):
                         if len(cword) <= n:
                             break
-                        add_or_append(self.f101_count_dict, (cword[:n], ctag), size=self.fix_weights(n))
+                        add_or_append(self.f101_count_dict, (cword[:n], ctag), size=self.fix_weights[n-1])
 
     def count_f102(self):
         with open(self.file_path) as f:
@@ -77,7 +77,7 @@ class FeatureStatisticsClass:
                     for n in range(1, 5):
                         if len(cword) <= n:
                             break
-                        add_or_append(self.f102_count_dict, (cword[-n:], ctag), size=self.fix_weights(n))
+                        add_or_append(self.f102_count_dict, (cword[-n:], ctag), size=self.fix_weights[n-1])
 
     def count_f103(self):
         with open(self.file_path) as f:
