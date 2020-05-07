@@ -1,5 +1,6 @@
 import numpy as np
 
+from math import exp
 from auxiliary_functions import BEGIN, STOP, get_words_arr, exp_multiply_sparse
 
 
@@ -12,9 +13,12 @@ def calc_q(feature_ids, weights, history, ctag, denominator):
     :param denominator: The denominator for the given history
     :return: q for a given history and tag
     """
-    exp_weights = np.exp(weights)
-    feature_rep = feature_ids.sparse_feature_representation(history, ctag)
-    numerator = exp_multiply_sparse(exp_weights, feature_rep)
+    feature_vec = feature_ids.dense_feature_representation(history, ctag)
+    numerator = exp(feature_vec @ weights)
+
+    # exp_weights = np.exp(weights)
+    # feature_vec = feature_ids.sparse_feature_representation(history, ctag)
+    # numerator = exp_multiply_sparse(exp_weights, feature_vec)
     return numerator / denominator
 
 
@@ -26,11 +30,20 @@ def calc_q_denominator(feature_ids, weights, all_tags, history):
     :param history: A certain history, presented in the following format: (cword, pptag, ptag, pword, nword)
     :return: The denominator of function calc_q for a certain history
     """
-    exp_weights = np.exp(weights)
+    # feature_matrix = np.empty((len(all_tags), feature_ids.total_features))
+    # for i in range(len(all_tags)):
+    #     feature_matrix[i] = feature_ids.dense_feature_representation(history, all_tags[i])
+    # denominator = np.sum(np.exp(feature_matrix @ weights))
+
     denominator = 0
     for tag in all_tags:
-        feature_rep = feature_ids.sparse_feature_representation(history, tag)
-        denominator += exp_multiply_sparse(exp_weights, feature_rep)
+        denominator += exp(weights @ feature_ids.dense_feature_representation(history, tag))
+
+    # exp_weights = np.exp(weights)
+    # denominator = 0
+    # for tag in all_tags:
+    #     feature_rep = feature_ids.sparse_feature_representation(history, tag)
+    #     denominator += exp_multiply_sparse(exp_weights, feature_rep)
 
     return denominator
 
@@ -38,7 +51,7 @@ def calc_q_denominator(feature_ids, weights, all_tags, history):
 def memm_viterbi(feature_ids, weights, sentence, beam_size):
     all_tags = feature_ids.get_all_tags()
     words_arr = [BEGIN] + get_words_arr(sentence) + [STOP]
-    # Offsetting the size of the list to match the mathematical algorithm
+    # We offset the size of the list to match the mathematical algorithm
     n = len(words_arr) - 2
 
     pi = [{} for i in range(n + 1)]

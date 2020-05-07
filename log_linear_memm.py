@@ -117,7 +117,7 @@ class Log_Linear_MEMM:
             f.write('f109 = ' + str(self.f109) + '\n')
             f.write('f110 = ' + str(self.f110) + '\n')
 
-    def predict(self, input_data, beam_size):
+    def predict(self, input_data, beam_size=0):
         """
         Generates a prediction for a given input. Input can be either a sentence (string) or a file path.
         File can be in either .wtag or .words format.
@@ -137,7 +137,6 @@ class Log_Linear_MEMM:
 
         return memm_viterbi(self.feature2id, self.weights, input_data, beam_size)
 
-    # This is a function that is not used by anyone other than the function predict
     def __predict_file(self, file, beam_size):
         with open(file, 'r') as in_file:
             predictions = []
