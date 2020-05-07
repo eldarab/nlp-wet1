@@ -419,7 +419,7 @@ class Feature2Id:
                             self.f110_counter += 1
         self.total_features += self.f110_counter
 
-    def history_feature_representation(self, history, ctag):
+    def sparse_feature_representation(self, history, ctag):
         pword, cword, nword = history[4].lower(), history[0].lower(), history[3].lower()
         pptag, ptag = history[1], history[2]
         features = []
@@ -461,13 +461,66 @@ class Feature2Id:
 
         return np.array(features)
 
-    def calc_features_list(self, histories_list, ctags_list):
-        return np.array([self.history_feature_representation(histories_list[i], ctags_list[i])
-                        for i in range(len(histories_list))])
+    def dense_feature_representation(self, history, ctag, dim):
+        pword, cword, nword = history[4].lower(), history[0].lower(), history[3].lower()
+        pptag, ptag = history[1], history[2]
+        features = np.zeros(dim)
 
-    def build_features_mat(self, all_histories_list, all_tags_list):
+        if (cword, ctag) in self.f100_index_dict:
+            features[self.f100_index_dict[(cword, ctag)]] += 1
+
+        for n in range(1, 5):
+            if len(cword) <= n:
+                break
+            if (cword[:n], ctag) in self.f101_index_dict:
+                features[self.f101_index_dict[(cword[:n], ctag)]] += 1
+            if (cword[-n:], ctag) in self.f102_index_dict:
+                features[self.f102_index_dict[(cword[-n:], ctag)]] += 1
+
+        if (pptag, ptag, ctag) in self.f103_index_dict:
+            features[self.f103_index_dict[(pptag, ptag, ctag)]] += 1
+
+        if (ptag, ctag) in self.f104_index_dict:
+            features[self.f104_index_dict[(ptag, ctag)]] += 1
+
+        if ctag in self.f105_index_dict:
+            features[self.f105_index_dict[ctag]] += 1
+
+        if (pword, ctag) in self.f106_index_dict:
+            features[self.f106_index_dict[(pword, ctag)]] += 1
+
+        if (nword, ctag) in self.f107_index_dict:
+            features[self.f107_index_dict[(nword, ctag)]] += 1
+
+        if has_digit(cword) and (CONTAINS_DIGIT, ctag) in self.f108_index_dict:
+            features[self.f108_index_dict[(CONTAINS_DIGIT, ctag)]] += 1
+
+        if has_upper(cword) and (CONTAINS_UPPER, ctag) in self.f109_index_dict:
+            features[self.f109_index_dict[(CONTAINS_UPPER, ctag)]] += 1
+
+        if has_hyphen(cword) and (CONTAINS_HYPHEN, ctag) in self.f110_index_dict:
+            features[self.f110_index_dict[(CONTAINS_HYPHEN, ctag)]] += 1
+
+        return features
+
+    def calc_features_list(self, histories_list, corresponding_tags_list, dim):
+        row_dim = len(histories_list)
+        res = np.empty((row_dim, dim))
+        for i in range(row_dim):
+            res = self.dense_feature_representation(histories_list[i], corresponding_tags_list[i], dim)
+        return res
+
+        # return np.array([self.sparse_feature_representation(histories_list[i], corresponding_tags_list[i])
+        #                 for i in range(len(histories_list))])
+
+    def build_features_mat(self, all_histories_list, all_tags_list, dim):
         row_dim = len(all_histories_list)
         col_dim = len(all_tags_list)
-        feature_mat = np.array([[self.history_feature_representation(all_histories_list[i], all_tags_list[j])
-                                for j in range(col_dim)] for i in range(row_dim)])
-        return feature_mat
+        feature_matrix = np.empty(shape=(row_dim, col_dim, dim))
+        for i in range(row_dim):
+            for j in range(col_dim):
+                feature_matrix[i, j] = self.dense_feature_representation(all_histories_list[i], all_tags_list[j], dim)
+        return feature_matrix
+
+        # feature_matrix = np.array([[self.sparse_feature_representation(all_histories_list[i], all_tags_list[j])
+        #                         for j in range(col_dim)] for i in range(row_dim)])

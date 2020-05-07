@@ -13,7 +13,7 @@ def calc_q(feature_ids, weights, history, ctag, denominator):
     :return: q for a given history and tag
     """
     exp_weights = np.exp(weights)
-    feature_rep = feature_ids.history_feature_representation(history, ctag)
+    feature_rep = feature_ids.sparse_feature_representation(history, ctag)
     numerator = exp_multiply_sparse(exp_weights, feature_rep)
     return numerator / denominator
 
@@ -29,7 +29,7 @@ def calc_q_denominator(feature_ids, weights, all_tags, history):
     exp_weights = np.exp(weights)
     denominator = 0
     for tag in all_tags:
-        feature_rep = feature_ids.history_feature_representation(history, tag)
+        feature_rep = feature_ids.sparse_feature_representation(history, tag)
         denominator += exp_multiply_sparse(exp_weights, feature_rep)
 
     return denominator
