@@ -20,7 +20,7 @@ sns.set()
 
 
 class Log_Linear_MEMM:
-    def __init__(self, threshold=10, fix_threshold=-1, lam=0, maxiter=200, fix_weights=(0.5, 0.7, 1, 1),
+    def __init__(self, threshold=10, fix_threshold=-1, lam=0, maxiter=200, fix_weights=(0.3, 0.5, 1, 1),
                  f100=True, f101=True, f102=True, f103=True, f104=True, f105=True,
                  f106=True, f107=True, f108=True, f109=True, f110=True):
         self.train_path = None
@@ -80,7 +80,7 @@ class Log_Linear_MEMM:
         all_tags_list = self.feature2id.get_all_tags()
         all_histories, all_corresponding_tags = get_all_histories_and_corresponding_tags(self.train_path)
         features_list = self.feature2id.build_features_list(all_histories, all_corresponding_tags)
-        features_matrix = self.feature2id.build_features_mat(all_histories, all_tags_list)
+        features_matrix = self.feature2id.build_features_matrix(all_histories, all_tags_list)
         empirical_counts = calc_empirical_counts(features_list, self.dim)
         args = (self.dim, features_list, features_matrix, empirical_counts, self.lam, use_new)
         w_0 = np.random.random(self.dim)

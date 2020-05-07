@@ -505,7 +505,7 @@ class Feature2Id:
 
     def build_features_list(self, histories_list, corresponding_tags_list):
         row_dim = len(histories_list)
-        # res = np.empty((row_dim, dim))
+        # res = np.empty((row_dim, self.total_features))
         # for i in range(row_dim):
         #     res = self.dense_feature_representation(histories_list[i], corresponding_tags_list[i], dim)
 
@@ -513,7 +513,7 @@ class Feature2Id:
                for i in range(row_dim)]
         return res
 
-    def build_features_mat(self, all_histories_list, all_tags_list):
+    def build_features_matrix(self, all_histories_list, all_tags_list):
         row_dim = len(all_histories_list)
         col_dim = len(all_tags_list)
         # feature_matrix = np.empty(shape=(row_dim, col_dim, dim))
