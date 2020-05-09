@@ -38,6 +38,7 @@ def calc_q_denominator(feature_ids, weights, all_tags, history):
     denominator = 0
     for tag in all_tags:
         denominator += exp(weights @ feature_ids.dense_feature_representation(history, tag))
+        # denominator += exp(feature_ids.scipy_sparse_feature_representation(history, tag) @ weights)
 
     # exp_weights = np.exp(weights)
     # denominator = 0

@@ -2,6 +2,7 @@ from collections import OrderedDict
 from auxiliary_functions import get_words_arr, parse_lower, add_or_append, BEGIN, STOP, has_digit, CONTAINS_DIGIT, \
     has_hyphen, CONTAINS_HYPHEN, has_upper, CONTAINS_UPPER
 import numpy as np
+import scipy.sparse as sp
 
 
 class FeatureStatisticsClass:
@@ -502,6 +503,48 @@ class Feature2Id:
             features[self.f110_index_dict[(CONTAINS_HYPHEN, ctag)]] += 1
 
         return features
+
+    def scipy_sparse_feature_representation(self, history, ctag):
+        pword, cword, nword = history[4].lower(), history[0].lower(), history[3].lower()
+        pptag, ptag = history[1], history[2]
+        features = []
+
+        if (cword, ctag) in self.f100_index_dict:
+            features.append(self.f100_index_dict[(cword, ctag)])
+
+        for n in range(1, 5):
+            if len(cword) <= n:
+                break
+            if (cword[:n], ctag) in self.f101_index_dict:
+                features.append(self.f101_index_dict[(cword[:n], ctag)])
+            if (cword[-n:], ctag) in self.f102_index_dict:
+                features.append(self.f102_index_dict[(cword[-n:], ctag)])
+
+        if (pptag, ptag, ctag) in self.f103_index_dict:
+            features.append(self.f103_index_dict[(pptag, ptag, ctag)])
+
+        if (ptag, ctag) in self.f104_index_dict:
+            features.append(self.f104_index_dict[(ptag, ctag)])
+
+        if ctag in self.f105_index_dict:
+            features.append(self.f105_index_dict[ctag])
+
+        if (pword, ctag) in self.f106_index_dict:
+            features.append(self.f106_index_dict[(pword, ctag)])
+
+        if (nword, ctag) in self.f107_index_dict:
+            features.append(self.f107_index_dict[(nword, ctag)])
+
+        if has_digit(cword) and (CONTAINS_DIGIT, ctag) in self.f108_index_dict:
+            features.append(self.f108_index_dict[(CONTAINS_DIGIT, ctag)])
+
+        if has_upper(cword) and (CONTAINS_UPPER, ctag) in self.f109_index_dict:
+            features.append(self.f109_index_dict[(CONTAINS_UPPER, ctag)])
+
+        if has_hyphen(cword) and (CONTAINS_HYPHEN, ctag) in self.f110_index_dict:
+            features.append(self.f110_index_dict[(CONTAINS_HYPHEN, ctag)])
+
+        return sp.csr_matrix((np.ones_like(features), features, [0, len(features)]), shape=(1, self.total_features))
 
     def build_features_list(self, histories_list, corresponding_tags_list):
         row_dim = len(histories_list)

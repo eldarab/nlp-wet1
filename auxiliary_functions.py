@@ -1,4 +1,5 @@
 import numpy as np
+import scipy.sparse as sp
 
 BEGIN = '*B'
 STOP = '*S'
