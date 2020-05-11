@@ -77,7 +77,7 @@ class Log_Linear_MEMM:
                                                self.f106, self.f107, self.f108, self.f109, self.f110)
         self.dim = self.feature2id.total_features
 
-    def __optimize(self, use_new, iprint=-1):
+    def __optimize(self, use_new, iprint=20):
         # initializing parameters for fmin_l_bfgs_b
         all_tags_list = self.feature2id.get_all_tags()
         all_histories, all_corresponding_tags = get_all_histories_and_corresponding_tags(self.train_path)
