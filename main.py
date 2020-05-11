@@ -8,14 +8,14 @@ from validation import *
 if __name__ == '__main__':
     train_path = 'data/train2.wtag'
     report_path = 'dumps/report_small_2.csv'
-    write_report_header(report_path, write_acc_test=False)
+    write_report_header(report_path, small_model=False)
     start_index = 300
     thresholds = [5, 4, 3, 2, 1]
     fix_thresholds = [50, 30, 10, 5]
     lambdas = [10, 0.1, 0.01, 0]
     maxiter = 500
     fix_weights_list = [(1, 1, 1, 1)]
-    cv_small(train_path, report_path, start_index, thresholds, fix_thresholds, lambdas, maxiter, fix_weights_list)
+    validate(train_path, report_path, start_index, thresholds, fix_thresholds, lambdas, maxiter, fix_weights_list)
 
 
 
