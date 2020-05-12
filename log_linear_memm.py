@@ -134,7 +134,7 @@ class Log_Linear_MEMM:
             return self.__predict_file(input_data, beam_size)
 
         if len(input_data) > 5 and input_data[-5:] == '.wtag':
-            temp_file = r'data\temp.words'
+            temp_file = r'data\temp' + str(round(time())) + '.words'  # using time() to allow parallel runs
             clean_tags(input_data, temp_file)
             predictions = self.__predict_file(temp_file, beam_size)
             remove(temp_file)

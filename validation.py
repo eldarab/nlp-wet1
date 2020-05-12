@@ -63,7 +63,7 @@ def write_report_header(report_path, small_model):
     with open(report_path, 'w') as report:
         report.write('model_index,threshold,fix_threshold,lam,maxiter,iterations,fix_weights1,' +
                      'fix_weights2,fix_weights3,fix_weights4,acc_comp')
-        if small_model:
+        if not small_model:
             report.write(',acc_test')
         report.write('\n')
 
