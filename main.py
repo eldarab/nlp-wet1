@@ -42,5 +42,6 @@ if __name__ == '__main__':
         maxiter = 500
         validate(train_path, report_path, start_index, thresholds, fix_thresholds, lambdas, maxiter, fix_weights_list,
                  small_model=True)
-
+    if mode == 'train2acc':
+        print('hadargay')
 
