@@ -40,13 +40,28 @@ if __name__ == '__main__':
         thresholds = [1]
         fix_thresholds = [1]
         lambdas = [0.45]
-        fix_weights_list = [(0.55, 1, 1, 1), (0.1, 1, 1, 1), (0.055, 1, 1, 1), (0.01, 1, 1, 1), (0.0055, 1, 1, 1),
-                            (0.0001, 1, 1, 1)]
+        fix_weights_list = [(1, 1, 1, 1)]
         maxiter = 500
         validate(train_path, report_path, start_index, thresholds, fix_thresholds, lambdas, maxiter, fix_weights_list,
                  small_model=True)
     if mode == 'train2acc':
-        print('hadargay')
+        model602 = Log_Linear_MEMM.load_model('dumps/model602.pkl')
+        predictions602 = model602.predict('data/train2.wtag', beam_size=2)
+        accuracy602 = Log_Linear_MEMM.accuracy('data/train2.wtag', predictions602)
+        print(accuracy602)
+    if mode == 'big1':
+        print('big1')
+        train_path = 'data/train1.wtag'
+        report_path = 'dumps/report_big_1.csv'
+        write_report_header(report_path, small_model=False)
+        start_index = 700
+        thresholds = [1, 2]
+        fix_thresholds = [2]
+        lambdas = [0.1, 0.3, 0.5, 0.7, 1, 2, 3]
+        fix_weights_list = [(1, 1, 1, 1)]
+        maxiter = 500
+        validate(train_path, report_path, start_index, thresholds, fix_thresholds, lambdas, maxiter, fix_weights_list,
+                 small_model=False)
 
 
     train_data = r'data\train1.wtag'
