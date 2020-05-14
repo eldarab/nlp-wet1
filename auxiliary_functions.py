@@ -174,7 +174,7 @@ def get_predictions_list(predictions):
     predicted_tags = []
     for sentence in predictions:
         for word_tag_tuple in sentence:
-            predicted_tags = predicted_tags + word_tag_tuple[1]
+            predicted_tags.append(word_tag_tuple[1])
     return predicted_tags
 
 
