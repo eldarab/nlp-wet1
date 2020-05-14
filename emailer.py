@@ -2,6 +2,7 @@ import smtplib
 
 # TODO do not lehagish
 
+
 def send_email(username, password, to_addresses, body, subject='Your code just finished executing'):
     """
     Sends an email from a gmail account to any other email account, saying the code has finished executing.

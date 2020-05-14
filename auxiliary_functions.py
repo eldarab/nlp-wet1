@@ -65,17 +65,6 @@ def get_words_arr(line):
     return words_tags_arr
 
 
-def get_all_tags(file_path):
-    tags = []
-    with open(file_path, 'r') as f:
-        for line in f:
-            for word_tag in line.split():
-                tag = word_tag.split('_')[1]
-                if tag not in tags:
-                    tags.append(tag)
-    return tags
-
-
 def get_file_tags(file):
     """
     :param file: The path to a .wtag file
