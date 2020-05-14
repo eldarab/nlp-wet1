@@ -26,6 +26,9 @@ class FeatureStatisticsClass:
         self.f110_count_dict = OrderedDict()  # Contain Hyphen features
 
     def count_features(self, f100, f101, f102, f103, f104, f105, f106, f107, f108, f109, f110):
+        """
+        Main function that calls count functions for all features
+        """
         if f100:
             self.count_f100()
         if f101:
@@ -57,7 +60,6 @@ class FeatureStatisticsClass:
                     cword, ctag = parse_lower(word_tag)
                     add_or_append(self.f100_count_dict, (cword, ctag))
 
-    # TODO give different weights according to the length of the prefix/suffix
     def count_f101(self):
         with open(self.file_path) as f:
             for line in f:
@@ -110,26 +112,22 @@ class FeatureStatisticsClass:
                     ctag = word_tag.split('_')[1]
                     add_or_append(self.f105_count_dict, ctag)
 
-    def count_f106(self, skip_end=False):
+    def count_f106(self):
         with open(self.file_path) as f:
             for line in f:
                 words_tags_arr = get_words_arr(line)
                 n = len(words_tags_arr)
                 for i in range(n):
-                    if skip_end and i == n-1:
-                        continue
                     pword = words_tags_arr[i].split('_')[0].lower()
                     ctag = words_tags_arr[i+1].split('_')[1] if i < n-1 else STOP
                     add_or_append(self.f106_count_dict, (pword, ctag))
                     
-    def count_f107(self, skip_start=False):
+    def count_f107(self):
         with open(self.file_path) as f:
             for line in f:
                 words_tags_arr = get_words_arr(line)
                 n = len(words_tags_arr)
                 for i in range(n):
-                    if skip_start and i == 0:
-                        continue
                     nword = words_tags_arr[i].split('_')[0].lower()
                     ctag = words_tags_arr[i-1].split('_')[1] if i > 0 else BEGIN
                     add_or_append(self.f107_count_dict, (nword, ctag))
@@ -173,7 +171,6 @@ class Feature2Id:
         self.file_path = file_path
         self.feature_statistics: FeatureStatisticsClass = feature_statistics
         self.threshold = threshold  # feature count threshold - empirical count must be higher than this
-        # TODO crosscheck fix_threshold against fix_weights
         self.fix_threshold = fix_threshold  # feature count threshold for prefix and suffix features
         self.total_features = 0  # Total number of features accumulated
         # Internal feature indexing
@@ -245,9 +242,12 @@ class Feature2Id:
         A quick way to access all tags the model "knows", i.e. passed threshold.
         :return: List of tags
         """
-        return [tag for tag in self.f105_index_dict.keys()]
+        return list(self.f105_index_dict.keys())
 
     def get_master_index(self):
+        """
+        :return: A union of all of the dictionaries of the class
+        """
         master_index = OrderedDict()
         master_index.update(self.f100_index_dict)
         master_index.update(self.f101_index_dict)
@@ -255,6 +255,8 @@ class Feature2Id:
         master_index.update(self.f103_index_dict)
         master_index.update(self.f104_index_dict)
         master_index.update(self.f105_index_dict)
+        master_index.update(self.f106_index_dict)
+        master_index.update(self.f107_index_dict)
         master_index.update(self.f108_index_dict)
         master_index.update(self.f109_index_dict)
         master_index.update(self.f110_index_dict)
@@ -272,7 +274,6 @@ class Feature2Id:
                         self.f100_counter += 1
         self.total_features += self.f100_counter
 
-    # TODO weigh this feature according to prefix size
     def initialize_f101_index_dict(self):
         with open(self.file_path) as f:
             for line in f:
@@ -289,7 +290,6 @@ class Feature2Id:
                             self.f101_counter += 1
         self.total_features += self.f101_counter
 
-    # TODO weigh this feature according to suffix size
     def initialize_f102_index_dict(self):
         with open(self.file_path) as f:
             for line in f:
@@ -421,7 +421,15 @@ class Feature2Id:
         self.total_features += self.f110_counter
 
     def sparse_feature_representation(self, history, ctag):
-        pword, cword, nword = history[4].lower(), history[0].lower(), history[3].lower()
+        """
+        :param history: A tuple of the following format (cword, pptag, ptag, nword, nword)
+        :param ctag: The tag corresponding to the current word
+        :return: A sparse feature representation of the history+ctag
+        """
+        pword = history[3].lower() if (history[3] != BEGIN) else history[3]
+        cword = history[0].lower()
+        nword = history[4].lower() if history[4] != STOP else history[4]
+
         pptag, ptag = history[1], history[2]
         features = []
 
@@ -463,7 +471,12 @@ class Feature2Id:
         return np.array(features)
 
     def dense_feature_representation(self, history, ctag):
-        pword, cword, nword = history[4].lower(), history[0].lower(), history[3].lower()
+        """
+        :param history: A tuple of the following format (cword, pptag, ptag, nword, nword)
+        :param ctag: The tag corresponding to the current word
+        :return: A Dense feature representation of the history+ctag
+        """
+        pword, cword, nword = history[3].lower(), history[0].lower(), history[4].lower()
         pptag, ptag = history[1], history[2]
         features = np.zeros(self.total_features)
 
@@ -504,66 +517,26 @@ class Feature2Id:
 
         return features
 
-    def scipy_sparse_feature_representation(self, history, ctag):
-        pword, cword, nword = history[4].lower(), history[0].lower(), history[3].lower()
-        pptag, ptag = history[1], history[2]
-        features = []
-
-        if (cword, ctag) in self.f100_index_dict:
-            features.append(self.f100_index_dict[(cword, ctag)])
-
-        for n in range(1, 5):
-            if len(cword) <= n:
-                break
-            if (cword[:n], ctag) in self.f101_index_dict:
-                features.append(self.f101_index_dict[(cword[:n], ctag)])
-            if (cword[-n:], ctag) in self.f102_index_dict:
-                features.append(self.f102_index_dict[(cword[-n:], ctag)])
-
-        if (pptag, ptag, ctag) in self.f103_index_dict:
-            features.append(self.f103_index_dict[(pptag, ptag, ctag)])
-
-        if (ptag, ctag) in self.f104_index_dict:
-            features.append(self.f104_index_dict[(ptag, ctag)])
-
-        if ctag in self.f105_index_dict:
-            features.append(self.f105_index_dict[ctag])
-
-        if (pword, ctag) in self.f106_index_dict:
-            features.append(self.f106_index_dict[(pword, ctag)])
-
-        if (nword, ctag) in self.f107_index_dict:
-            features.append(self.f107_index_dict[(nword, ctag)])
-
-        if has_digit(cword) and (CONTAINS_DIGIT, ctag) in self.f108_index_dict:
-            features.append(self.f108_index_dict[(CONTAINS_DIGIT, ctag)])
-
-        if has_upper(cword) and (CONTAINS_UPPER, ctag) in self.f109_index_dict:
-            features.append(self.f109_index_dict[(CONTAINS_UPPER, ctag)])
-
-        if has_hyphen(cword) and (CONTAINS_HYPHEN, ctag) in self.f110_index_dict:
-            features.append(self.f110_index_dict[(CONTAINS_HYPHEN, ctag)])
-
-        return sp.csr_matrix((np.ones_like(features), features, [0, len(features)]), shape=(1, self.total_features))
-
     def build_features_list(self, histories_list, corresponding_tags_list):
+        """
+        :param histories_list: All histories in the data
+        :param corresponding_tags_list: The corresponding tags of the aforementioned tags
+        :return: a list of the feature representation for any history and tag that shows up in the train data
+        """
         row_dim = len(histories_list)
-        # res = np.empty((row_dim, self.total_features))
-        # for i in range(row_dim):
-        #     res = self.dense_feature_representation(histories_list[i], corresponding_tags_list[i], dim)
-
         res = [self.sparse_feature_representation(histories_list[i], corresponding_tags_list[i])
                for i in range(row_dim)]
         return res
 
     def build_features_matrix(self, all_histories_list, all_tags_list):
+        """
+        :param all_histories_list: All histories in the tags
+        :param all_tags_list: All of the tags that show up in the data
+        :return: A matrix of the feature representation of any possible combination of history from the data and
+        tag from the data, where cell i, j is the i-th history and the j-th cell.
+        """
         row_dim = len(all_histories_list)
         col_dim = len(all_tags_list)
-        # feature_matrix = np.empty(shape=(row_dim, col_dim, dim))
-        # for i in range(row_dim):
-        #     for j in range(col_dim):
-        #         feature_matrix[i, j] = self.dense_feature_representation(all_histories_list[i], all_tags_list[j], dim)
-
         feature_matrix = [[self.sparse_feature_representation(all_histories_list[i], all_tags_list[j])
                            for j in range(col_dim)] for i in range(row_dim)]
         return feature_matrix

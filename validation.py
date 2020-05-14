@@ -1,7 +1,7 @@
 from log_linear_memm import Log_Linear_MEMM
 import pickle
 
-
+# TODO do no lehagish
 def validate(train_path, report_path, start_index, thresholds, fix_thresholds, lambdas, maxiter, fix_weights_list,
              small_model):
     model_index = start_index

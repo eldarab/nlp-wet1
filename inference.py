@@ -15,10 +15,6 @@ def calc_q(feature_ids, weights, history, ctag, denominator):
     """
     feature_vec = feature_ids.dense_feature_representation(history, ctag)
     numerator = exp(feature_vec @ weights)
-
-    # exp_weights = np.exp(weights)
-    # feature_vec = feature_ids.sparse_feature_representation(history, ctag)
-    # numerator = exp_multiply_sparse(exp_weights, feature_vec)
     return numerator / denominator
 
 
@@ -30,26 +26,22 @@ def calc_q_denominator(feature_ids, weights, all_tags, history):
     :param history: A certain history, presented in the following format: (cword, pptag, ptag, pword, nword)
     :return: The denominator of function calc_q for a certain history
     """
-    # feature_matrix = np.empty((len(all_tags), feature_ids.total_features))
-    # for i in range(len(all_tags)):
-    #     feature_matrix[i] = feature_ids.dense_feature_representation(history, all_tags[i])
-    # denominator = np.sum(np.exp(feature_matrix @ weights))
-
     denominator = 0
     for tag in all_tags:
         denominator += exp(weights @ feature_ids.dense_feature_representation(history, tag))
-        # denominator += exp(feature_ids.scipy_sparse_feature_representation(history, tag) @ weights)
-
-    # exp_weights = np.exp(weights)
-    # denominator = 0
-    # for tag in all_tags:
-    #     feature_rep = feature_ids.sparse_feature_representation(history, tag)
-    #     denominator += exp_multiply_sparse(exp_weights, feature_rep)
 
     return denominator
 
 
 def memm_viterbi(feature_ids, weights, sentence, beam_size):
+    """
+    Viterbi prediction function based on lectures
+    :param feature_ids:
+    :param weights:
+    :param sentence:
+    :param beam_size:
+    :return:
+    """
     all_tags = feature_ids.get_all_tags()
     words_arr = [BEGIN] + get_words_arr(sentence) + [STOP]
     # We offset the size of the list to match the mathematical algorithm
