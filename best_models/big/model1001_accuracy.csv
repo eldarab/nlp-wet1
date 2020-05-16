@@ -1,0 +1,2 @@
+model_index,threshold,fix_threshold,lam,maxiter,iterations,fix_weights1,fix_weights2,fix_weights3,fix_weights4,acc_comp,acc_test
+1001,1,3,0.4,500,340,1,1,1,1,0.920840749,0.944200389
