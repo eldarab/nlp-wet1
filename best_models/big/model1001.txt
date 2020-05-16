@@ -1,0 +1,23 @@
+model name: model1001
+
+
+train_path = data/train1.wtag
+dim = 101079
+threshold = 1
+fix_threshold = 3
+fix_weights = (1, 1, 1, 1)
+fit time = 23829.01 sec
+lam = 0.4
+maxiter = 500
+iter = 340
+f100 = True
+f101 = True
+f102 = True
+f103 = True
+f104 = True
+f105 = True
+f106 = True
+f107 = True
+f108 = True
+f109 = True
+f110 = True

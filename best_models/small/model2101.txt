@@ -1,0 +1,23 @@
+model name: model2101
+
+
+train_path = data/train2.wtag
+dim = 8380
+threshold = 2
+fix_threshold = 1
+fix_weights = (1, 1, 1, 1)
+fit time = 168.54 sec
+lam = 0.32
+maxiter = 500
+iter = 104
+f100 = True
+f101 = True
+f102 = True
+f103 = True
+f104 = True
+f105 = True
+f106 = True
+f107 = True
+f108 = True
+f109 = True
+f110 = True
