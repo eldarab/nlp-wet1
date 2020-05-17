@@ -1,27 +1,34 @@
 from validation import *
 from sys import argv
-from time import time
 from log_linear_memm import Log_Linear_MEMM
 
-# TODO do not lehagish
+
 if __name__ == '__main__':
-    train_data = r'data\train1.wtag'
-    test_data = r'data\test1.wtag'
-    threshold, lam, maxiter = 100, 10, 100
-    weights = (0.3, 0.5, 1, 1)
-
-    # start_time = time()
-    # model = Log_Linear_MEMM(threshold=threshold, lam=lam, maxiter=maxiter, fix_weights=weights)
-    # model.fit(train_data)
-    # train_time = time()
-    # print('Finished optimizing, runtime', train_time-start_time)
-    #
-    # predictions = model.predict(test_data)
-    # prediction_time = time()
-    # print('Finished predicting, runtime', prediction_time-train_time)
-    # print('Accuracy', Log_Linear_MEMM.accuracy(test_path=test_data, predictions=predictions))
-    # Accuracy of 0.84278
-
-    model = Log_Linear_MEMM.load_model(r'dumps\tested\train1 lambda-10 threshold-100 weights-(0.3, 0.5, 1, 1).pkl')
-    predictions = model.predict(test_data)
-    print('Accuracy', Log_Linear_MEMM.accuracy(test_path=test_data, predictions=predictions))
+    mode = argv[1]
+    if mode == 'big_final':
+        print('big_final')
+        train_path = 'data/train1.wtag'
+        report_path = 'dumps/report_big_3_after_change.csv'
+        write_report_header(report_path, small_model=False)
+        start_index = 1000
+        thresholds = [1]
+        fix_thresholds = [2, 3]
+        lambdas = [0.4]
+        fix_weights_list = [(1, 1, 1, 1)]
+        maxiter = 500
+        validate(train_path, report_path, start_index, thresholds, fix_thresholds, lambdas, maxiter, fix_weights_list,
+                 small_model=False)
+    if mode == 'small_final':
+        print('small_final')
+        train_path = 'data/train2.wtag'
+        report_path = 'dumps/report_small_2_after_change.csv'
+        write_report_header(report_path, small_model=True)
+        start_index = 2100
+        thresholds = [2, 3, 4]
+        fix_thresholds = [1, 2, 3, 4]
+        lambdas = [0.3, 0.32, 0.34, 0.36, 0.38, 0.4]
+        fix_weights_list = [(1, 1, 1, 1)]
+        maxiter = 500
+        validate(train_path, report_path, start_index, thresholds, fix_thresholds, lambdas, maxiter,
+                 fix_weights_list,
+                 small_model=True)
